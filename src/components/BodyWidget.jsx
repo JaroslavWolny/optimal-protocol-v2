@@ -7,17 +7,40 @@ import * as THREE from 'three';
 import './BodyWidget.css';
 
 // --- GEOMETRY PARTS (The Body) ---
-// Místo teček skládáme postavu z "hard-light" geometrie
 
-const CyberPwrt = ({ position, args, type = "box", color, speed = 1, wireframe = true }) => {
+const CyberPwrt = ({ position, args, type = "box", color, speed = 1, integrity = 1, isPumped = false }) => {
     const mesh = useRef();
+    const [randomOffset] = useState(() => Math.random() * 100);
 
     useFrame((state) => {
         const t = state.clock.getElapsedTime();
-        // Jemné dýchání / pohyb částí
-        mesh.current.position.y = position[1] + Math.sin(t * speed) * 0.02;
-        mesh.current.rotation.z = Math.sin(t * 0.5) * 0.02;
+
+        // Base movement
+        let yPos = position[1] + Math.sin(t * speed + randomOffset) * 0.02;
+        let rotZ = Math.sin(t * 0.5 + randomOffset) * 0.02;
+
+        // WITHER EFFECT: Glitchy movement if integrity is low
+        if (integrity < 0.4) {
+            if (Math.random() > 0.95) {
+                yPos += (Math.random() - 0.5) * 0.1;
+                rotZ += (Math.random() - 0.5) * 0.2;
+            }
+        }
+
+        // PUMP EFFECT: Scale pulse
+        if (isPumped) {
+            const pumpScale = 1 + Math.sin(t * 10) * 0.05;
+            mesh.current.scale.setScalar(pumpScale);
+        } else {
+            mesh.current.scale.setScalar(1);
+        }
+
+        mesh.current.position.y = THREE.MathUtils.lerp(mesh.current.position.y, yPos, 0.1);
+        mesh.current.rotation.z = THREE.MathUtils.lerp(mesh.current.rotation.z, rotZ, 0.1);
     });
+
+    // Wither visual state
+    const isWithered = integrity < 0.4;
 
     return (
         <mesh ref={mesh} position={position}>
@@ -25,27 +48,28 @@ const CyberPwrt = ({ position, args, type = "box", color, speed = 1, wireframe =
             {type === "sphere" && <icosahedronGeometry args={args} />}
             {type === "capsule" && <capsuleGeometry args={args} />}
 
-            {/* Vnitřní jádro (plné) */}
+            {/* Vnitřní jádro (plné) - fades out when withered */}
             <meshStandardMaterial
                 color={color}
                 emissive={color}
-                emissiveIntensity={2}
+                emissiveIntensity={isPumped ? 4 : (isWithered ? 0.5 : 2)}
                 transparent
-                opacity={0.15}
+                opacity={isWithered ? 0.05 : 0.15}
                 roughness={0.2}
                 metalness={1}
+                wireframe={isWithered && Math.random() > 0.5} // Flicker wireframe when withered
             />
 
             {/* Vnější Wireframe (Hologram efekt) */}
             <lineSegments>
                 <edgesGeometry args={[type === "box" ? new THREE.BoxGeometry(...args) : (type === "sphere" ? new THREE.IcosahedronGeometry(...args) : new THREE.CapsuleGeometry(...args))]} />
-                <lineBasicMaterial color={color} opacity={0.6} transparent />
+                <lineBasicMaterial color={color} opacity={isPumped ? 1 : 0.6} transparent />
             </lineSegments>
         </mesh>
     );
 };
 
-const CyborgModel = ({ stats, integrity, isGodMode }) => {
+const CyborgModel = ({ stats, integrity, isGodMode, isPumped }) => {
     // Dynamická barva podle dominantního statu
     const baseColor = useMemo(() => {
         if (isGodMode) return '#FFD700'; // GOLD for God Mode
@@ -61,23 +85,23 @@ const CyborgModel = ({ stats, integrity, isGodMode }) => {
     return (
         <group position={[0, -0.8, 0]}>
             {/* HEAD - Brain Core */}
-            <CyberPwrt position={[0, 1.6, 0]} args={[0.25, 1]} type="sphere" color={finalColor} speed={isGodMode ? 5 : 2} />
+            <CyberPwrt position={[0, 1.6, 0]} args={[0.25, 1]} type="sphere" color={finalColor} speed={isGodMode ? 5 : 2} integrity={integrity} isPumped={isPumped} />
 
             {/* TORSO - Main Reactor */}
-            <CyberPwrt position={[0, 0.8, 0]} args={[0.4, 0.6, 0.3]} type="box" color={finalColor} speed={isGodMode ? 4 : 1.5} />
+            <CyberPwrt position={[0, 0.8, 0]} args={[0.4, 0.6, 0.3]} type="box" color={finalColor} speed={isGodMode ? 4 : 1.5} integrity={integrity} isPumped={isPumped} />
 
-            {/* ARMS */}
-            <CyberPwrt position={[-0.5, 0.8, 0]} args={[0.1, 0.6, 4, 8]} type="capsule" color={finalColor} speed={isGodMode ? 3 : 1.2} />
-            <CyberPwrt position={[0.5, 0.8, 0]} args={[0.1, 0.6, 4, 8]} type="capsule" color={finalColor} speed={isGodMode ? 3 : 1.2} />
+            {/* ARMS - Pump up more */}
+            <CyberPwrt position={[-0.5, 0.8, 0]} args={[0.1, 0.6, 4, 8]} type="capsule" color={finalColor} speed={isGodMode ? 3 : 1.2} integrity={integrity} isPumped={isPumped} />
+            <CyberPwrt position={[0.5, 0.8, 0]} args={[0.1, 0.6, 4, 8]} type="capsule" color={finalColor} speed={isGodMode ? 3 : 1.2} integrity={integrity} isPumped={isPumped} />
 
             {/* LEGS */}
-            <CyberPwrt position={[-0.2, 0, 0]} args={[0.12, 0.8, 4, 8]} type="capsule" color={finalColor} speed={isGodMode ? 2 : 0.8} />
-            <CyberPwrt position={[0.2, 0, 0]} args={[0.12, 0.8, 4, 8]} type="capsule" color={finalColor} speed={isGodMode ? 2 : 0.8} />
+            <CyberPwrt position={[-0.2, 0, 0]} args={[0.12, 0.8, 4, 8]} type="capsule" color={finalColor} speed={isGodMode ? 2 : 0.8} integrity={integrity} isPumped={isPumped} />
+            <CyberPwrt position={[0.2, 0, 0]} args={[0.12, 0.8, 4, 8]} type="capsule" color={finalColor} speed={isGodMode ? 2 : 0.8} integrity={integrity} isPumped={isPumped} />
         </group>
     );
 };
 
-const BodyWidget = ({ stats, userLevel = 1 }) => {
+const BodyWidget = ({ stats, isPumped = false }) => {
     // Výpočet "zdraví" hologramu - nyní používáme správné klíče (0-1)
     const integrity = stats ? (stats.training + stats.nutrition + stats.recovery + stats.knowledge) / 4 : 0;
     const isGodMode = integrity >= 0.9;
@@ -95,7 +119,7 @@ const BodyWidget = ({ stats, userLevel = 1 }) => {
         }
         prevIntegrity.current = integrity;
 
-        if (integrity < 0.3) setMessage("CRITICAL ERROR. FEED ME DATA.");
+        if (integrity < 0.3) setMessage("CRITICAL FAILURE. INTEGRITY LOW.");
         else if (integrity < 0.6) setMessage("SYSTEMS STABILIZING...");
         else if (integrity < 0.9) setMessage("OPTIMAL PERFORMANCE.");
         else setMessage("GOD MODE ENGAGED.");
@@ -131,7 +155,7 @@ const BodyWidget = ({ stats, userLevel = 1 }) => {
             >
                 {/* Osvětlení */}
                 <ambientLight intensity={isGodMode ? 1.5 : 0.5} />
-                <pointLight position={[10, 10, 10]} intensity={isGodMode ? 5 : (surge ? 3 : 1)} color={glowColor} />
+                <pointLight position={[10, 10, 10]} intensity={isGodMode ? 5 : (surge || isPumped ? 4 : 1)} color={glowColor} />
                 <pointLight position={[-10, -10, -10]} intensity={0.5} color="blue" />
 
                 {/* The Character - Floating Animation */}
@@ -141,16 +165,16 @@ const BodyWidget = ({ stats, userLevel = 1 }) => {
                     floatIntensity={isGodMode ? 1.5 : 0.5}
                     floatingRange={isGodMode ? [-0.2, 0.2] : [-0.1, 0.1]}
                 >
-                    <CyborgModel stats={stats || { training: 0, nutrition: 0, recovery: 0, knowledge: 0 }} integrity={integrity} isGodMode={isGodMode} />
+                    <CyborgModel stats={stats || { training: 0, nutrition: 0, recovery: 0, knowledge: 0 }} integrity={integrity} isGodMode={isGodMode} isPumped={isPumped} />
                 </Float>
 
                 {/* Particles around */}
                 <Sparkles
                     key={isGodMode ? 'god-mode-sparkles' : 'normal-sparkles'} // Force re-render on mode switch
-                    count={isGodMode ? 150 : (surge ? 100 : 50)}
+                    count={isGodMode ? 150 : (surge || isPumped ? 120 : 50)}
                     scale={isGodMode ? 3.5 : 3}
-                    size={isGodMode ? 6 : (surge ? 4 : 2)}
-                    speed={isGodMode ? 0.4 : (surge ? 2 : 0.4)}
+                    size={isGodMode ? 6 : (surge || isPumped ? 5 : 2)}
+                    speed={isGodMode ? 0.4 : (surge || isPumped ? 3 : 0.4)}
                     opacity={isGodMode ? 1 : 0.5}
                     color={glowColor}
                 />
@@ -161,7 +185,7 @@ const BodyWidget = ({ stats, userLevel = 1 }) => {
                     <Bloom
                         luminanceThreshold={0.1}
                         mipmapBlur
-                        intensity={isGodMode ? 2.5 : (surge ? 3 : 1.5)}
+                        intensity={isGodMode ? 2.5 : (surge || isPumped ? 4 : 1.5)}
                         radius={isGodMode ? 0.8 : 0.6}
                     />
 

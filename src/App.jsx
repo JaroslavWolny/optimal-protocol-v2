@@ -8,8 +8,8 @@ import Calendar from './components/Calendar';
 import Award from './components/Award';
 import ShareCard from './components/ShareCard';
 import BodyWidget from './components/BodyWidget';
-
 import KnowledgeCardModal from './components/KnowledgeCardModal';
+import { soundManager } from './utils/SoundManager';
 
 function App() {
   const [habits, setHabits] = useState(() => {
@@ -23,6 +23,9 @@ function App() {
   });
 
   const [showKnowledgeCard, setShowKnowledgeCard] = useState(false);
+  const [isPumped, setIsPumped] = useState(false);
+  const [isShaking, setIsShaking] = useState(false);
+
   const shareRef = useRef(null);
 
   useEffect(() => {
@@ -32,6 +35,13 @@ function App() {
   useEffect(() => {
     localStorage.setItem('habit_history', JSON.stringify(history));
   }, [history]);
+
+  // Initialize Audio Context on first interaction
+  useEffect(() => {
+    const initAudio = () => soundManager.init();
+    window.addEventListener('click', initAudio, { once: true });
+    return () => window.removeEventListener('click', initAudio);
+  }, []);
 
   const getTodayStr = () => {
     const date = new Date();
@@ -149,10 +159,23 @@ function App() {
       if (isCompleted) {
         // STRICT MODE: Cannot undo a completed habit for the day
         triggerHaptic('medium'); // Error vibration
+        soundManager.playGlitch();
         return prev;
       } else {
         newTodayCompleted = [...todayCompleted, id];
         triggerHaptic('success');
+
+        // --- VITALITY EFFECTS ---
+        soundManager.playThud();
+        setIsShaking(true);
+        setTimeout(() => setIsShaking(false), 300);
+
+        const habit = habits.find(h => h.id === id);
+        if (habit && habit.category === 'training') {
+          setIsPumped(true);
+          setTimeout(() => setIsPumped(false), 2000);
+        }
+        // ------------------------
 
         // Check for Perfect Day
         if (habits.length > 0 && newTodayCompleted.length === habits.length) {
@@ -167,12 +190,14 @@ function App() {
               origin: { y: 0.6 },
               colors: ['#39FF14', '#ffffff'] // Neon Green & White
             });
+            soundManager.playCharge();
           }
         }
       }
 
       if (shouldTriggerCard) {
         setTimeout(() => setShowKnowledgeCard(true), 500);
+        soundManager.playCharge();
       }
 
       return {
@@ -257,11 +282,17 @@ function App() {
 
   const currentStats = calculateStats();
 
+  // Determine Pulse Class
+  const integrity = (currentStats.training + currentStats.nutrition + currentStats.recovery + currentStats.knowledge) / 4;
+  let pulseClass = '';
+  if (integrity < 0.4) pulseClass = 'pulse-red';
+  else if (streak > 3 || integrity > 0.8) pulseClass = 'pulse-green';
+
   return (
-    <div className="app-container">
+    <div className={`app-container ${isShaking ? 'shake-effect' : ''} ${pulseClass}`}>
       <div className="header-row">
         <div className="app-brand">
-          <h1>OPTIMAL APP</h1>
+          <h1 className="glitch-text" data-text="OPTIMAL APP">OPTIMAL APP</h1>
         </div>
         <div className="streak-minimal">
           <span className="streak-fire">🔥</span>
@@ -273,7 +304,7 @@ function App() {
 
       <div className="glass-panel main-panel">
 
-        <BodyWidget stats={currentStats} isAllDone={isAllDone} />
+        <BodyWidget stats={currentStats} isAllDone={isAllDone} isPumped={isPumped} />
 
 
         <AddHabit onAdd={addHabit} />
