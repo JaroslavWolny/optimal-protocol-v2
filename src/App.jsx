@@ -51,6 +51,7 @@ function App() {
   // --- PERMADEATH LOGIC (Moved from hook for side effects) ---
   useEffect(() => {
     if (hardcoreMode) {
+      document.body.classList.add('hardcore-active');
       const hasHistory = Object.keys(history).length > 0;
 
       if (streak === 0 && hasHistory) {
@@ -63,6 +64,8 @@ function App() {
           setTimeout(() => alert("☠️ HARDCORE MODE: YOU MISSED A DAY. PROTOCOL RESET. ☠️"), 100);
         }
       }
+    } else {
+      document.body.classList.remove('hardcore-active');
     }
   }, [streak, hardcoreMode, history, today, setHistory]);
 
