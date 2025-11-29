@@ -289,7 +289,13 @@ function App() {
 
       <div className="glass-panel main-panel">
 
-        <BodyWidget stats={currentStats} isAllDone={isAllDone} isPumped={isPumped} streak={streak} hardcoreMode={hardcoreMode} />
+        <BodyWidget
+          stats={{ training: 1, nutrition: 1, recovery: 1, knowledge: 1 }}
+          isAllDone={true}
+          isPumped={true}
+          streak={51}
+          hardcoreMode={hardcoreMode}
+        />
 
         {habits.length === 0 ? (
           <ProtocolSelector onSelect={handleProtocolSelect} />
