@@ -9,7 +9,9 @@ import Award from './components/Award';
 import ShareCard from './components/ShareCard';
 import BodyWidget from './components/BodyWidget';
 import KnowledgeCardModal from './components/KnowledgeCardModal';
+import ProofHUD from './components/ProofHUD';
 import { soundManager } from './utils/SoundManager';
+import { notificationManager } from './utils/NotificationManager';
 import { Shield, Skull } from 'lucide-react';
 import { useHabits } from './hooks/useHabits';
 import { useGamification } from './hooks/useGamification';
@@ -22,14 +24,31 @@ function App() {
   const [isPumped, setIsPumped] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
 
+  // PROOF HUD STATE
+  const [proofImage, setProofImage] = useState(null);
+  const [showProofHUD, setShowProofHUD] = useState(false);
+  const fileInputRef = useRef(null);
+  const proofRef = useRef(null);
   const shareRef = useRef(null);
 
-  // Initialize Audio Context on first interaction
+  // Initialize Audio & Notifications on first interaction
   useEffect(() => {
-    const initAudio = () => soundManager.init();
-    window.addEventListener('click', initAudio, { once: true });
-    return () => window.removeEventListener('click', initAudio);
-  }, []);
+    const initServices = () => {
+      soundManager.init();
+      notificationManager.requestPermission();
+    };
+    window.addEventListener('click', initServices, { once: true });
+
+    // Check for aggressive notifications every minute
+    const interval = setInterval(() => {
+      notificationManager.checkRoutine(habits, history);
+    }, 60000);
+
+    return () => {
+      window.removeEventListener('click', initServices);
+      clearInterval(interval);
+    };
+  }, [habits, history]);
 
   // --- PERMADEATH LOGIC (Moved from hook for side effects) ---
   useEffect(() => {
@@ -125,17 +144,46 @@ function App() {
     });
   };
 
-  const handleShare = async () => {
-    if (shareRef.current) {
-      const canvas = await html2canvas(shareRef.current, {
+  const handleShare = () => {
+    // Trigger file input
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProofImage(e.target.result);
+        setShowProofHUD(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const downloadProof = async () => {
+    if (proofRef.current) {
+      // Wait a bit for image to render
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const canvas = await html2canvas(proofRef.current, {
         backgroundColor: '#000000',
-        scale: 2
+        scale: 2,
+        useCORS: true
       });
+
       const image = canvas.toDataURL("image/png");
       const link = document.createElement('a');
       link.href = image;
-      link.download = `optimal-body-${today}.png`;
+      link.download = `optimal-proof-${today}.png`;
       link.click();
+
+      // Reset
+      setShowProofHUD(false);
+      setProofImage(null);
+      soundManager.playCharge(); // Success sound
     }
   };
 
@@ -207,6 +255,55 @@ function App() {
 
   return (
     <div className={`app-container ${isShaking ? 'shake-effect' : ''} ${pulseClass}`}>
+      {/* Hidden File Input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        accept="image/*"
+        onChange={handleFileChange}
+      />
+
+      {/* Proof HUD Modal */}
+      {showProofHUD && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: 10000,
+          background: 'rgba(0,0,0,0.95)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <div style={{ transform: 'scale(0.35)', transformOrigin: 'center center', border: '2px solid #333' }}>
+            <ProofHUD ref={proofRef} streak={streak} image={proofImage} />
+          </div>
+
+          <div style={{ marginTop: '20px', display: 'flex', gap: '20px', zIndex: 10001 }}>
+            <button
+              onClick={() => {
+                setShowProofHUD(false);
+                setProofImage(null);
+              }}
+              style={{ padding: '15px 30px', background: '#333', color: 'white', border: '1px solid #555', borderRadius: '100px', fontSize: '16px', cursor: 'pointer', fontFamily: 'Outfit' }}
+            >
+              CANCEL
+            </button>
+            <button
+              onClick={downloadProof}
+              style={{ padding: '15px 30px', background: '#39FF14', color: 'black', border: 'none', borderRadius: '100px', fontSize: '16px', fontWeight: '800', cursor: 'pointer', fontFamily: 'Outfit', letterSpacing: '1px' }}
+            >
+              DOWNLOAD PROOF
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="header-row">
         <div className="app-brand">
           <h1 className="glitch-text" data-text="OPTIMAL APP">OPTIMAL APP</h1>
@@ -253,8 +350,8 @@ function App() {
 
       <div className="fixed-action-bar">
         <button className="share-btn-large" onClick={handleShare}>
-          <span className="camera-icon">⚔️</span>
-          <span className="action-text">SHARE DOMINANCE</span>
+          <span className="camera-icon">📸</span>
+          <span className="action-text">PROOF OF WORK</span>
           <div className="btn-shine"></div>
         </button>
       </div>

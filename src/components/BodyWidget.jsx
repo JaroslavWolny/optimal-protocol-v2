@@ -111,18 +111,26 @@ const BodyWidget = ({ stats, isPumped = false }) => {
     const [surge, setSurge] = useState(false);
     const prevIntegrity = useRef(integrity);
 
-    // Detekce změny integrity pro efekt "Power Surge"
+    // Aggressive Message Logic
     useEffect(() => {
         if (integrity > prevIntegrity.current) {
             setSurge(true);
-            setTimeout(() => setSurge(false), 1000); // 1s surge
+            setTimeout(() => setSurge(false), 1000);
         }
         prevIntegrity.current = integrity;
 
-        if (integrity < 0.3) setMessage("CRITICAL FAILURE. INTEGRITY LOW.");
-        else if (integrity < 0.6) setMessage("SYSTEMS STABILIZING...");
-        else if (integrity < 0.9) setMessage("OPTIMAL PERFORMANCE.");
-        else setMessage("GOD MODE ENGAGED.");
+        const hour = new Date().getHours();
+
+        if (integrity < 0.3) {
+            setMessage("FAILURE IMMINENT. DO SOMETHING.");
+        } else if (integrity < 0.6) {
+            if (hour >= 20) setMessage("YOU ARE RUNNING OUT OF TIME.");
+            else setMessage("MEDIOCRE PERFORMANCE.");
+        } else if (integrity < 0.9) {
+            setMessage("STAY HARD. NOT DONE YET.");
+        } else {
+            setMessage("WHO IS GONNA CARRY THE BOATS?");
+        }
     }, [integrity]);
 
     // Barva světla pro scénu
