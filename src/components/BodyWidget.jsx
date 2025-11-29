@@ -103,8 +103,8 @@ const DoomAvatar = ({ stats, integrity, stage, hardcoreMode }) => {
         const time = state.clock.elapsedTime;
         const snappedTime = Math.floor(time * FPS_LIMIT) / FPS_LIMIT;
 
-        // "Idle Bobbing" - vycentrováno
-        group.current.position.y = -0.8 + Math.sin(snappedTime * 2) * 0.05;
+        // "Idle Bobbing" - PERFEKTNĚ VYCENTROVÁNO (změněno na -0.25)
+        group.current.position.y = -0.25 + Math.sin(snappedTime * 2) * 0.05;
 
         // Jemné natočení do stran (Idle stance)
         group.current.rotation.y = Math.sin(snappedTime * 1) * 0.05;
@@ -115,6 +115,19 @@ const DoomAvatar = ({ stats, integrity, stage, hardcoreMode }) => {
 
     return (
         <group ref={group}>
+            {/* --- GOD MODE AURA (EPIC PARTICLES) --- */}
+            {isGodMode && (
+                <Sparkles
+                    count={100}
+                    scale={4}
+                    size={4}
+                    speed={0.4}
+                    opacity={0.8}
+                    color={hardcoreMode ? "#b026ff" : "#ffd700"}
+                    position={[0, 0, 0]}
+                />
+            )}
+
             {/* --- HLAVA (Helmet) --- */}
             <group position={[0, 1.45, 0]} scale={headIntel}>
                 <RetroLimb args={[0.35, 0.4, 0.4]} color={primaryColor} edgeColor={edgeColor} /> {/* Helma */}
