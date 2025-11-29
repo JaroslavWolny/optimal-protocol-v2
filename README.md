@@ -6,7 +6,7 @@
 
 **OPTIMAL PROTOCOL** is not a checklist. It is a **Cybernetic Life Simulator** linked directly to your daily discipline. You are the Operator. The **Cyber-Construct** is your digital twin. If you slack off, it glitches and decays. If you dominate, it evolves into a **GODLIKE** state.
 
-**v3.0 UPDATE:** We have abandoned abstract geometry for a raw, **Retro PS1 / Metal Gear Solid** aesthetic.
+**v3.0 UPDATE:** We have abandoned abstract geometry for a raw, **Retro FPS (Doom/Quake)** aesthetic.
 
 ---
 
@@ -22,7 +22,7 @@
 
 ## 🤖 THE AVATAR SYSTEM (v3.0)
 
-Your twin is no longer a sphere. It is a **Low-Poly Entity** that physically transforms based on your discipline.
+Your twin is no longer a sphere. It is a **Procedural Retro-FPS Sprite** that physically transforms based on your discipline.
 
 ### 1. 🧬 EVOLUTIONARY STAGES
 - **💀 STAGE 0: WITHERED (Low Integrity)**
@@ -35,8 +35,20 @@ Your twin is no longer a sphere. It is a **Low-Poly Entity** that physically tra
   - Full Cyborg Augmentation. Golden armor, neon veins.
   - Environment: **High-Tech Laboratory**. Clean, cold, clinical perfection.
 
-### 2. 📺 PS1 VISUAL ENGINE
-- **Pixelation Shader:** The entire 3D scene is downsampled to mimic 32-bit console graphics.
+### 2. 🎭 VISUAL MODES
+The avatar changes appearance based on your selected protocol mode:
+
+#### 🛡️ SAFE MODE
+- **Normal:** **Doom Marine**. Classic military green armor, human skin.
+- **God Mode:** **Golden Saint**. Polished gold armor, glowing white skin, cyan energy.
+
+#### ☠️ DEATH MODE
+- **Normal:** **Cyber-Necromancer**. Dark navy/purple armor, necrotic grey/red skin, neon red edges.
+- **God Mode:** **THE VOID WALKER**. Vantablack armor, dark matter skin, blinding white singularity core, purple event horizon particles.
+
+### 3. 📺 PS1/RETRO ENGINE
+- **Stop-Motion Animation:** Character animates at 12 FPS for that crunchy 90s feel.
+- **Pixelation Shader:** The entire 3D scene is downsampled to mimic 320x240 resolution.
 - **No Anti-Aliasing:** Raw, jagged edges for maximum retro authenticity.
 - **CRT Effects:** Scanlines, noise, and chromatic aberration.
 

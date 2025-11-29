@@ -103,8 +103,8 @@ const DoomAvatar = ({ stats, integrity, stage, hardcoreMode }) => {
         const time = state.clock.elapsedTime;
         const snappedTime = Math.floor(time * FPS_LIMIT) / FPS_LIMIT;
 
-        // "Idle Bobbing" - PERFEKTNĚ VYCENTROVÁNO (změněno na -0.25)
-        group.current.position.y = -0.25 + Math.sin(snappedTime * 2) * 0.05;
+        // "Idle Bobbing" - POSUNUTO DOLŮ kvůli textu (změněno na -0.5)
+        group.current.position.y = -0.5 + Math.sin(snappedTime * 2) * 0.05;
 
         // Jemné natočení do stran (Idle stance)
         group.current.rotation.y = Math.sin(snappedTime * 1) * 0.05;
@@ -212,7 +212,7 @@ const BodyWidget = ({ stats, isPumped = false, streak = 0, hardcoreMode = false 
 
             <Canvas
                 // KABINETNÍ PROJEKCE (Jako v editoru map Doom)
-                camera={{ position: [0, 0, 4.5], fov: 50 }}
+                camera={{ position: [0, 0, 5.0], fov: 50 }}
                 gl={{ antialias: false, preserveDrawingBuffer: true }}
                 dpr={1} // Zvýšeno pro lepší čitelnost před pixelizací
             >
