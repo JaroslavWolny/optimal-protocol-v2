@@ -19,20 +19,20 @@ class SoundManager {
     playThud() {
         if (!this.initialized) this.init();
         const t = this.ctx.currentTime;
-        
+
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        
+
         osc.type = 'square';
         osc.frequency.setValueAtTime(150, t);
         osc.frequency.exponentialRampToValueAtTime(40, t + 0.15);
-        
+
         gain.gain.setValueAtTime(1, t);
         gain.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
-        
+
         osc.connect(gain);
         gain.connect(this.masterGain);
-        
+
         osc.start(t);
         osc.stop(t + 0.2);
 
@@ -44,21 +44,21 @@ class SoundManager {
     playCharge() {
         if (!this.initialized) this.init();
         const t = this.ctx.currentTime;
-        
+
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        
+
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(50, t);
         osc.frequency.exponentialRampToValueAtTime(800, t + 1.0);
-        
+
         gain.gain.setValueAtTime(0, t);
         gain.gain.linearRampToValueAtTime(0.5, t + 0.5);
         gain.gain.exponentialRampToValueAtTime(0.01, t + 1.0);
-        
+
         osc.connect(gain);
         gain.connect(this.masterGain);
-        
+
         osc.start(t);
         osc.stop(t + 1.0);
     }
@@ -67,23 +67,23 @@ class SoundManager {
     playGlitch() {
         if (!this.initialized) this.init();
         const t = this.ctx.currentTime;
-        
+
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        
+
         osc.type = 'sawtooth';
-        
+
         // Random frequency jumps
         osc.frequency.setValueAtTime(100, t);
         osc.frequency.setValueAtTime(800, t + 0.05);
         osc.frequency.setValueAtTime(200, t + 0.1);
-        
+
         gain.gain.setValueAtTime(0.5, t);
         gain.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
-        
+
         osc.connect(gain);
         gain.connect(this.masterGain);
-        
+
         osc.start(t);
         osc.stop(t + 0.2);
     }
@@ -99,14 +99,39 @@ class SoundManager {
 
         const noise = this.ctx.createBufferSource();
         noise.buffer = buffer;
-        
+
         const noiseGain = this.ctx.createGain();
         noiseGain.gain.setValueAtTime(0.5, this.ctx.currentTime);
         noiseGain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-        
+
         noise.connect(noiseGain);
         noiseGain.connect(this.masterGain);
         noise.start();
+    }
+
+    // Permadeath / Game Over
+    playGameOver() {
+        if (!this.initialized) this.init();
+        const t = this.ctx.currentTime;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(100, t);
+        osc.frequency.exponentialRampToValueAtTime(10, t + 1.5);
+
+        gain.gain.setValueAtTime(0.5, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 1.5);
+
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+
+        osc.start(t);
+        osc.stop(t + 1.5);
+
+        // Add low rumble
+        this.playNoise(1.5);
     }
 }
 

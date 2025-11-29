@@ -1782,3 +1782,31 @@ body,
   80% { clip: rect(20px, 9999px, 50px, 0); }
   100% { clip: rect(60px, 9999px, 30px, 0); }
 }
+
+/* --- HARDCORE MODE --- */
+.hardcore-toggle {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #888;
+    padding: 0.5rem 1rem;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 1px;
+}
+
+.hardcore-toggle.active {
+    background: #ff003c;
+    color: white;
+    border-color: #ff003c;
+    box-shadow: 0 0 15px rgba(255, 0, 60, 0.4);
+    animation: pulse-red-border 2s infinite;
+}
+
+@keyframes pulse-red-border {
+    0% { border-color: #ff003c; }
+    50% { border-color: white; }
+    100% { border-color: #ff003c; }
+}

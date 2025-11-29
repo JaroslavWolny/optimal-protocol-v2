@@ -26,6 +26,16 @@ function App() {
   const [isPumped, setIsPumped] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
 
+  // HARDCORE MODE STATE
+  const [hardcoreMode, setHardcoreMode] = useState(() => {
+    const saved = localStorage.getItem('hardcore_mode');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('hardcore_mode', JSON.stringify(hardcoreMode));
+  }, [hardcoreMode]);
+
   const shareRef = useRef(null);
 
   useEffect(() => {
@@ -89,6 +99,32 @@ function App() {
     return streak;
   };
 
+  const streak = calculateStreak();
+
+  // --- PERMADEATH LOGIC ---
+  useEffect(() => {
+    if (hardcoreMode) {
+      // If streak is 0 AND we have history (meaning we started but failed), WIPE IT.
+      const hasHistory = Object.keys(history).length > 0;
+
+      if (streak === 0 && hasHistory) {
+        // Check if we actually missed yesterday (or before)
+        const dates = Object.keys(history).sort();
+        const lastDateStr = dates[dates.length - 1];
+
+        // If last active date is NOT today, and streak is 0, it means we broke the chain.
+        if (lastDateStr && lastDateStr !== today) {
+          // PERMADEATH TRIGGER
+          setHistory({});
+          soundManager.playGameOver();
+          // Use a small timeout to ensure UI renders before alert blocks it (though alert blocks anyway)
+          setTimeout(() => alert("☠️ HARDCORE MODE: YOU MISSED A DAY. PROTOCOL RESET. ☠️"), 100);
+        }
+      }
+    }
+  }, [streak, hardcoreMode, history, today]);
+  // ------------------------
+
   const calculateHabitStreak = (habitId) => {
     let streak = 0;
     const todayDate = new Date();
@@ -116,8 +152,6 @@ function App() {
     }
     return streak;
   };
-
-  const streak = calculateStreak();
 
   const triggerHaptic = (type = 'light') => {
     if (navigator.vibrate) {
@@ -294,9 +328,22 @@ function App() {
         <div className="app-brand">
           <h1 className="glitch-text" data-text="OPTIMAL APP">OPTIMAL APP</h1>
         </div>
-        <div className="streak-minimal">
-          <span className="streak-fire">🔥</span>
-          <span className="streak-val">{streak}</span>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            className={`hardcore-toggle ${hardcoreMode ? 'active' : ''}`}
+            onClick={() => {
+              setHardcoreMode(!hardcoreMode);
+              soundManager.playThud();
+            }}
+            title="Toggle Permadeath Mode"
+          >
+            {hardcoreMode ? '☠️ HARDCORE' : '🛡️ NORMAL'}
+          </button>
+          <div className="streak-minimal">
+            <span className="streak-fire">🔥</span>
+            <span className="streak-val">{streak}</span>
+          </div>
         </div>
       </div>
 
