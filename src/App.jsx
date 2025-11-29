@@ -25,9 +25,7 @@ function App() {
   const [isShaking, setIsShaking] = useState(false);
 
   // PROOF HUD STATE
-  const [proofImage, setProofImage] = useState(null);
   const [showProofHUD, setShowProofHUD] = useState(false);
-  const fileInputRef = useRef(null);
   const proofRef = useRef(null);
   const shareRef = useRef(null);
 
@@ -145,22 +143,7 @@ function App() {
   };
 
   const handleShare = () => {
-    // Trigger file input
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setProofImage(e.target.result);
-        setShowProofHUD(true);
-      };
-      reader.readAsDataURL(file);
-    }
+    setShowProofHUD(true);
   };
 
   const downloadProof = async () => {
@@ -169,7 +152,7 @@ function App() {
       await new Promise(resolve => setTimeout(resolve, 500));
 
       const canvas = await html2canvas(proofRef.current, {
-        backgroundColor: '#000000',
+        backgroundColor: null,
         scale: 2,
         useCORS: true
       });
@@ -177,12 +160,11 @@ function App() {
       const image = canvas.toDataURL("image/png");
       const link = document.createElement('a');
       link.href = image;
-      link.download = `optimal-proof-${today}.png`;
+      link.download = `optimal-overlay-${today}.png`;
       link.click();
 
       // Reset
       setShowProofHUD(false);
-      setProofImage(null);
       soundManager.playCharge(); // Success sound
     }
   };
@@ -255,14 +237,6 @@ function App() {
 
   return (
     <div className={`app-container ${isShaking ? 'shake-effect' : ''} ${pulseClass}`}>
-      {/* Hidden File Input */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        style={{ display: 'none' }}
-        accept="image/*"
-        onChange={handleFileChange}
-      />
 
       {/* Proof HUD Modal */}
       {showProofHUD && (
@@ -273,23 +247,27 @@ function App() {
           width: '100vw',
           height: '100vh',
           zIndex: 10000,
-          background: 'rgba(0,0,0,0.95)',
+          background: 'rgba(0,0,0,0.8)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          backdropFilter: 'blur(10px)'
+          backdropFilter: 'blur(5px)'
         }}>
-          <div style={{ transform: 'scale(0.35)', transformOrigin: 'center center', border: '2px solid #333' }}>
-            <ProofHUD ref={proofRef} streak={streak} image={proofImage} />
+          <div style={{
+            transform: 'scale(0.35)',
+            transformOrigin: 'center center',
+            border: '2px dashed #555',
+            backgroundImage: 'linear-gradient(45deg, #222 25%, transparent 25%), linear-gradient(-45deg, #222 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #222 75%), linear-gradient(-45deg, transparent 75%, #222 75%)',
+            backgroundSize: '20px 20px',
+            backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px'
+          }}>
+            <ProofHUD ref={proofRef} streak={streak} />
           </div>
 
           <div style={{ marginTop: '20px', display: 'flex', gap: '20px', zIndex: 10001 }}>
             <button
-              onClick={() => {
-                setShowProofHUD(false);
-                setProofImage(null);
-              }}
+              onClick={() => setShowProofHUD(false)}
               style={{ padding: '15px 30px', background: '#333', color: 'white', border: '1px solid #555', borderRadius: '100px', fontSize: '16px', cursor: 'pointer', fontFamily: 'Outfit' }}
             >
               CANCEL
@@ -298,7 +276,7 @@ function App() {
               onClick={downloadProof}
               style={{ padding: '15px 30px', background: '#39FF14', color: 'black', border: 'none', borderRadius: '100px', fontSize: '16px', fontWeight: '800', cursor: 'pointer', fontFamily: 'Outfit', letterSpacing: '1px' }}
             >
-              DOWNLOAD PROOF
+              DOWNLOAD OVERLAY
             </button>
           </div>
         </div>
@@ -351,7 +329,7 @@ function App() {
       <div className="fixed-action-bar">
         <button className="share-btn-large" onClick={handleShare}>
           <span className="camera-icon">📸</span>
-          <span className="action-text">PROOF OF WORK</span>
+          <span className="action-text">GENERATE OVERLAY</span>
           <div className="btn-shine"></div>
         </button>
       </div>

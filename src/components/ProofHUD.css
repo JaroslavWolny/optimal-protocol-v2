@@ -4,33 +4,13 @@
     width: 1080px;
     height: 1920px;
     position: relative;
-    background: #000;
+    background: transparent;
     overflow: hidden;
     font-family: 'Share Tech Mono', monospace;
     color: rgba(255, 255, 255, 0.9);
 }
 
-.proof-bg-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 0;
-}
-
-.proof-bg-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 4rem;
-    color: #333;
-    background: #111;
-    letter-spacing: 10px;
-}
+/* Removed proof-bg-image and proof-bg-placeholder */
 
 .hud-overlay {
     position: absolute;
@@ -76,8 +56,15 @@
 }
 
 @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
 }
 
 .compass-ticks {
@@ -108,10 +95,33 @@
     border: 4px solid rgba(255, 255, 255, 0.6);
 }
 
-.top-left { top: 60px; left: 60px; border-right: none; border-bottom: none; }
-.top-right { top: 60px; right: 60px; border-left: none; border-bottom: none; }
-.bottom-left { bottom: 60px; left: 60px; border-right: none; border-top: none; }
-.bottom-right { bottom: 60px; right: 60px; border-left: none; border-top: none; }
+.top-left {
+    top: 60px;
+    left: 60px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.top-right {
+    top: 60px;
+    right: 60px;
+    border-left: none;
+    border-bottom: none;
+}
+
+.bottom-left {
+    bottom: 60px;
+    left: 60px;
+    border-right: none;
+    border-top: none;
+}
+
+.bottom-right {
+    bottom: 60px;
+    right: 60px;
+    border-left: none;
+    border-top: none;
+}
 
 /* --- PANELS --- */
 .hud-panel {
@@ -216,7 +226,7 @@
 .scanlines {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.2));
     background-size: 100% 4px;
     pointer-events: none;
     z-index: 20;
@@ -226,7 +236,7 @@
 .vignette {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.8) 100%);
+    background: radial-gradient(circle, transparent 50%, rgba(0, 0, 0, 0.8) 100%);
     pointer-events: none;
     z-index: 15;
 }

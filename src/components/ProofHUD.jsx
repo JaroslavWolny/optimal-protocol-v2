@@ -2,7 +2,7 @@ import React, { forwardRef, useState, useEffect } from 'react';
 import './ProofHUD.css';
 import { Crosshair, Battery, Wifi, Activity, Zap } from 'lucide-react';
 
-const ProofHUD = forwardRef(({ streak, image, stats }, ref) => {
+const ProofHUD = forwardRef(({ streak, stats }, ref) => {
     const [time, setTime] = useState(new Date());
 
     // Fake running timecode
@@ -33,11 +33,7 @@ const ProofHUD = forwardRef(({ streak, image, stats }, ref) => {
 
     return (
         <div ref={ref} className="proof-hud-container">
-            {/* Background Image */}
-            {image && <img src={image} alt="Proof" className="proof-bg-image" />}
-            {!image && <div className="proof-bg-placeholder">NO SIGNAL</div>}
-
-            {/* HUD Overlay Layer */}
+            {/* HUD Overlay Layer - No Background Image */}
             <div className="hud-overlay">
 
                 {/* --- TOP BAR --- */}
