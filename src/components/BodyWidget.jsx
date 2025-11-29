@@ -56,14 +56,14 @@ const DoomAvatar = ({ stats, integrity, stage }) => {
     const coreBulk = 0.7 + (nut * 0.6);     // Trup
     const headIntel = 0.9 + (know * 0.3);   // Hlava
 
-    // Colors (Doom Palette)
-    const armorGreen = '#5b6e53'; // Doom Marine Green
-    const fleshColor = '#c48666'; // Pixelated Skin
-    const demonRed = '#ff003c';   // Hell Energy
+    // Colors (Doom Palette) - Brightened for visibility
+    const armorGreen = '#7c9670'; // Lighter Doom Marine Green
+    const fleshColor = '#e0a686'; // Lighter Pixelated Skin
+    const demonRed = '#ff3360';   // Brighter Hell Energy
     const godGold = '#ffd700';    // God Mode
 
-    const primaryColor = stage === "GODLIKE" ? godGold : (integrity < 0.3 ? '#2a2a2a' : armorGreen);
-    const coreColor = rec > 0.8 ? '#00ff00' : (rec > 0.4 ? '#00aaaa' : '#ff0000'); // Health pack colors
+    const primaryColor = stage === "GODLIKE" ? godGold : (integrity < 0.3 ? '#4a4a4a' : armorGreen);
+    const coreColor = rec > 0.8 ? '#33ff33' : (rec > 0.4 ? '#33cccc' : '#ff3333'); // Health pack colors
 
     // --- RETRO ANIMATION LOOP ---
     useFrame((state) => {
@@ -177,36 +177,37 @@ const BodyWidget = ({ stats, isPumped = false, streak = 0 }) => {
                 // KABINETNÍ PROJEKCE (Jako v editoru map Doom)
                 camera={{ position: [0, 0, 4.5], fov: 50 }}
                 gl={{ antialias: false, preserveDrawingBuffer: true }}
-                dpr={0.5} // Poloviční rozlišení pro pixelizaci už na úrovni rendereru
+                dpr={1} // Zvýšeno pro lepší čitelnost před pixelizací
             >
-                <color attach="background" args={['#050505']} />
+                <color attach="background" args={['#101010']} /> {/* Trochu světlejší pozadí */}
 
-                {/* Lighting - High Contrast Doom Style */}
-                <ambientLight intensity={0.4} />
-                <directionalLight position={[5, 10, 5]} intensity={1.5} castShadow />
-                <pointLight position={[0, 0, 3]} intensity={0.5} color={glowColor} distance={5} />
+                {/* Lighting - High Contrast Doom Style - ZESVĚTLENO */}
+                <ambientLight intensity={0.8} />
+                <directionalLight position={[2, 5, 5]} intensity={3.0} castShadow />
+                <pointLight position={[-5, 2, 5]} intensity={1.0} color="#4444ff" distance={10} /> {/* Fill light */}
+                <pointLight position={[0, 0, 3]} intensity={0.8} color={glowColor} distance={5} />
 
                 {/* Environment - Simple Grid */}
-                <gridHelper args={[20, 20, 0x333333, 0x111111]} position={[0, -2.5, 0]} />
+                <gridHelper args={[20, 20, 0x444444, 0x222222]} position={[0, -2.5, 0]} />
 
                 <DoomAvatar stats={safeStats} integrity={integrity} stage={stage} />
 
                 {/* POST PROCESSING - THE RETRO MAGIC */}
                 <EffectComposer disableNormalPass>
-                    {/* 1. Pixelation - Udělá z toho kostičky (rozlišení 320x240 feel) */}
-                    <Pixelation granularity={6} />
+                    {/* 1. Pixelation - Jemnější, aby byla postava poznat */}
+                    <Pixelation granularity={4} />
 
                     {/* 2. Bloom - Aby svítily oči a reaktor */}
-                    <Bloom luminanceThreshold={0.5} intensity={1.5} radius={0.8} />
+                    <Bloom luminanceThreshold={0.6} intensity={1.2} radius={0.6} />
 
                     {/* 3. Noise - Zrnění jako na staré CRT televizi */}
-                    <Noise opacity={0.15} />
+                    <Noise opacity={0.1} />
 
                     {/* 4. Scanlines - Řádkování obrazovky */}
-                    <Scanline density={1.5} opacity={0.3} />
+                    <Scanline density={1.2} opacity={0.15} />
 
                     {/* 5. Vignette - Ztmavení rohů pro hororový efekt */}
-                    <Vignette eskil={false} offset={0.1} darkness={1.1} />
+                    <Vignette eskil={false} offset={0.1} darkness={0.6} />
 
                     {/* 6. Glitch - Jen když jsi na dně */}
                     <Glitch
