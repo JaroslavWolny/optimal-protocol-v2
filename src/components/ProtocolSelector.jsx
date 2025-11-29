@@ -1,6 +1,6 @@
 import React from 'react';
 import './ProtocolSelector.css';
-import { Sword, Brain, PenTool } from 'lucide-react';
+import { Sword, Brain, PenTool, Sliders } from 'lucide-react';
 
 const protocols = [
     {
@@ -40,6 +40,16 @@ const protocols = [
             { text: '3L Water', category: 'nutrition' },
             { text: 'Gym Session', category: 'training' },
             { text: 'Plan Tomorrow', category: 'knowledge' }
+        ]
+    },
+    {
+        id: 'custom',
+        name: 'CUSTOM',
+        subtitle: 'DESIGN YOUR SYSTEM',
+        icon: <Sliders size={32} />,
+        color: '#ffffff',
+        habits: [
+            { text: 'Define Objective 1', category: 'training' }
         ]
     }
 ];
