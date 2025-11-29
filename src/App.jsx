@@ -10,6 +10,7 @@ import ShareCard from './components/ShareCard';
 import BodyWidget from './components/BodyWidget';
 import KnowledgeCardModal from './components/KnowledgeCardModal';
 import { soundManager } from './utils/SoundManager';
+import { Shield, Skull } from 'lucide-react';
 
 function App() {
   const [habits, setHabits] = useState(() => {
@@ -102,6 +103,22 @@ function App() {
   const streak = calculateStreak();
 
   // --- PERMADEATH LOGIC ---
+  const toggleHardcore = () => {
+    if (!hardcoreMode) {
+      // Enabling Hardcore
+      const confirm = window.confirm("⚠️ WARNING: HARDCORE MODE ⚠️\n\nIf you miss ONE day, your entire progress (Streak & Level) will be WIPED.\n\nAre you sure you have what it takes?");
+      if (confirm) {
+        setHardcoreMode(true);
+        soundManager.playThud();
+        triggerHaptic('heavy');
+      }
+    } else {
+      // Disabling Hardcore
+      setHardcoreMode(false);
+      soundManager.playThud();
+    }
+  };
+
   useEffect(() => {
     if (hardcoreMode) {
       // If streak is 0 AND we have history (meaning we started but failed), WIPE IT.
@@ -329,17 +346,20 @@ function App() {
           <h1 className="glitch-text" data-text="OPTIMAL APP">OPTIMAL APP</h1>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="header-controls">
           <button
-            className={`hardcore-toggle ${hardcoreMode ? 'active' : ''}`}
-            onClick={() => {
-              setHardcoreMode(!hardcoreMode);
-              soundManager.playThud();
-            }}
-            title="Toggle Permadeath Mode"
+            className={`mode-switch ${hardcoreMode ? 'hardcore' : 'normal'}`}
+            onClick={toggleHardcore}
+            title={hardcoreMode ? "Disable Hardcore Mode" : "Enable Hardcore Mode"}
           >
-            {hardcoreMode ? '☠️ HARDCORE' : '🛡️ NORMAL'}
+            <div className="switch-track">
+              <div className="switch-thumb">
+                {hardcoreMode ? <Skull size={14} /> : <Shield size={14} />}
+              </div>
+            </div>
+            <span className="mode-label">{hardcoreMode ? 'DEATH' : 'SAFE'}</span>
           </button>
+
           <div className="streak-minimal">
             <span className="streak-fire">🔥</span>
             <span className="streak-val">{streak}</span>
