@@ -259,3 +259,114 @@
         transform: rotate(360deg);
     }
 }
+/* --- POWER LEVEL --- */
+.power-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: -40px;
+}
+
+.power-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 32px;
+    color: #666;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
+}
+
+.power-value {
+    font-size: 180px;
+    font-weight: 900;
+    font-style: italic;
+    line-height: 0.9;
+    letter-spacing: -5px;
+}
+
+.pvp-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 42px;
+    font-weight: 800;
+    color: white;
+    margin-top: 40px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.8;
+}
+
+/* --- RPG STATS GRID --- */
+.rpg-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+    padding: 0 40px;
+    margin-bottom: 60px;
+}
+
+.rpg-stat-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.rpg-stat-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 32px;
+    color: #888;
+}
+
+.rpg-stat-val {
+    font-size: 80px;
+    font-weight: 800;
+    color: white;
+    line-height: 1;
+}
+
+.rpg-bar-bg {
+    width: 100%;
+    height: 16px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.rpg-bar-fill {
+    height: 100%;
+    border-radius: 8px;
+}
+
+/* --- IDENTITY FOOTER --- */
+.identity-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 60px;
+    margin-bottom: 60px;
+}
+
+.id-rank {
+    font-size: 64px;
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+}
+
+.id-streak {
+    font-size: 48px;
+    font-weight: 700;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.fire-icon {
+    font-size: 56px;
+}

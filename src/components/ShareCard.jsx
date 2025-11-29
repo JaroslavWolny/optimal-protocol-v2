@@ -7,51 +7,59 @@ const ShareCard = forwardRef(({ streak, habits, todayHabits, history }, ref) => 
     const completedToday = todayHabits.filter(h => h.completed).length;
     const completionRate = totalHabits > 0 ? (completedToday / totalHabits) : 0;
 
-    // 2. Nová logika STATUSŮ (Identity System)
+    // 2. Power Level Logic (DBZ style)
+    const basePower = 1000;
+    const streakBonus = streak * 800;
+    const dailyBonus = completedToday * 500;
+    let powerLevel = basePower + streakBonus + dailyBonus;
+    if (completionRate === 1) powerLevel = Math.round(powerLevel * 1.2); // 20% Boost for perfection
+
+    // 3. RPG Stats Calculation (0-99)
+    const getCatRate = (cat) => {
+        const catHabits = todayHabits.filter(h => (h.category || 'training') === cat);
+        if (catHabits.length === 0) return 0;
+        return catHabits.filter(h => h.completed).length / catHabits.length;
+    };
+
+    // STR: Training based
+    const strRaw = getCatRate('training');
+    const str = Math.round(strRaw * 99);
+
+    // DIS: Consistency/Streak based + Daily completion
+    const disRaw = (completionRate + (Math.min(streak, 30) / 30)) / 2;
+    const dis = Math.round(disRaw * 99);
+
+    // TEQ: Knowledge + Recovery + Nutrition
+    const teqRaw = (getCatRate('knowledge') + getCatRate('recovery') + getCatRate('nutrition')) / 3;
+    const teq = Math.round((teqRaw || 0) * 99);
+
+
+    // 4. Identity System
     let statusTitle = 'ROOKIE';
     let statusColor = '#94a3b8'; // Grey
     let statusGlow = '0 0 0 transparent';
     let subMessage = 'SYSTEM OFFLINE';
 
-    if (completionRate === 1) {
+    if (powerLevel > 9000) {
         statusTitle = 'GODLIKE';
         statusColor = '#39FF14'; // Neon Green
-        statusGlow = '0 0 40px rgba(57, 255, 20, 0.6)';
+        statusGlow = '0 0 50px rgba(57, 255, 20, 0.8)';
         subMessage = 'MAXIMUM EFFICIENCY';
-    } else if (completionRate >= 0.8) {
-        statusTitle = 'VANGUARD';
+    } else if (powerLevel > 5000) {
+        statusTitle = 'ELITE';
         statusColor = '#39D1FF'; // Cyan
-        statusGlow = '0 0 30px rgba(57, 209, 255, 0.4)';
+        statusGlow = '0 0 40px rgba(57, 209, 255, 0.5)';
         subMessage = 'HIGH PERFORMANCE';
-    } else if (completionRate >= 0.4) {
+    } else if (powerLevel > 2000) {
         statusTitle = 'OPERATIVE';
         statusColor = '#FFD139'; // Gold
-        statusGlow = '0 0 20px rgba(255, 209, 57, 0.3)';
+        statusGlow = '0 0 30px rgba(255, 209, 57, 0.4)';
         subMessage = 'SYSTEM STABLE';
-    } else if (completionRate > 0) {
-        statusTitle = 'DRIFTER';
+    } else {
+        statusTitle = 'INITIATE';
         statusColor = '#ff6b6b'; // Red
         subMessage = 'LOW ENERGY';
     }
-
-    // Kategorizace pro vizuál (s opravou Nutrition -> Supplements)
-    const categories = {
-        training: { label: 'TRAINING', count: 0, done: 0, color: '#39FF14' },
-        nutrition: { label: 'SUPPLEMENTS', count: 0, done: 0, color: '#FF39D1' }, // RENAMED
-        recovery: { label: 'RECOVERY', count: 0, done: 0, color: '#39D1FF' },
-        knowledge: { label: 'KNOWLEDGE', count: 0, done: 0, color: '#FFD139' }
-    };
-
-    todayHabits.forEach(h => {
-        const cat = (h.category || 'training').toLowerCase();
-        // Map old nutrition category to new structure if needed, or assume data is clean
-        const targetCat = cat === 'nutrition' ? 'nutrition' : cat;
-
-        if (categories[targetCat]) {
-            categories[targetCat].count++;
-            if (h.completed) categories[targetCat].done++;
-        }
-    });
 
     return (
         <div ref={ref} className="share-card-v2">
@@ -72,62 +80,66 @@ const ShareCard = forwardRef(({ streak, habits, todayHabits, history }, ref) => 
                     </div>
                 </header>
 
-                {/* --- MAIN REACTOR (Identity) --- */}
-                <section className="status-core">
-                    <div className="core-ring-outer" style={{ borderColor: `${statusColor}33` }}>
-                        <div className="core-ring-inner" style={{ borderColor: statusColor, boxShadow: statusGlow }}>
-                            <div className="streak-val">{streak}</div>
-                            <div className="streak-label">DAY STREAK</div>
-                        </div>
+                {/* --- POWER LEVEL (The Flex) --- */}
+                <section className="power-section">
+                    <div className="power-label">POWER LEVEL</div>
+                    <div className="power-value" style={{ color: statusColor, textShadow: statusGlow }}>
+                        {powerLevel.toLocaleString()}
                     </div>
-
-                    <div className="status-title-group">
-                        <div className="status-label">CURRENT DESIGNATION</div>
-                        <h1 className="status-main" style={{ color: statusColor, textShadow: statusGlow }}>
-                            {statusTitle}
-                        </h1>
-                        <div className="status-sub">/// {subMessage} ///</div>
+                    <div className="pvp-text">
+                        "YOU ARE NOT ON MY LEVEL."
                     </div>
                 </section>
 
-                {/* --- TACTICAL READOUT (Stats) --- */}
-                <section className="tactical-grid">
-                    {Object.values(categories).map((cat) => (
-                        cat.count > 0 && (
-                            <div key={cat.label} className="tactical-row">
-                                <div className="tactical-info">
-                                    <span className="t-label">{cat.label}</span>
-                                    <span className="t-val" style={{ color: cat.done === cat.count ? cat.color : '#666' }}>
-                                        {cat.done}/{cat.count}
-                                    </span>
-                                </div>
-                                <div className="tactical-bar-bg">
-                                    <div
-                                        className="tactical-bar-fill"
-                                        style={{
-                                            width: `${(cat.done / cat.count) * 100}%`,
-                                            backgroundColor: cat.color,
-                                            boxShadow: cat.done === cat.count ? `0 0 10px ${cat.color}` : 'none'
-                                        }}
-                                    ></div>
-                                </div>
-                            </div>
-                        )
-                    ))}
+                {/* --- CHARACTER SHEET (RPG Stats) --- */}
+                <section className="rpg-stats-grid">
+                    {/* STR */}
+                    <div className="rpg-stat-box">
+                        <div className="rpg-stat-label">STR</div>
+                        <div className="rpg-stat-val">{str}</div>
+                        <div className="rpg-bar-bg">
+                            <div className="rpg-bar-fill" style={{ width: `${str}%`, background: '#ff003c' }}></div>
+                        </div>
+                    </div>
+
+                    {/* DIS */}
+                    <div className="rpg-stat-box">
+                        <div className="rpg-stat-label">DIS</div>
+                        <div className="rpg-stat-val">{dis}</div>
+                        <div className="rpg-bar-bg">
+                            <div className="rpg-bar-fill" style={{ width: `${dis}%`, background: '#39D1FF' }}></div>
+                        </div>
+                    </div>
+
+                    {/* TEQ */}
+                    <div className="rpg-stat-box">
+                        <div className="rpg-stat-label">TEQ</div>
+                        <div className="rpg-stat-val">{teq}</div>
+                        <div className="rpg-bar-bg">
+                            <div className="rpg-bar-fill" style={{ width: `${teq}%`, background: '#FFD139' }}></div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* --- IDENTITY --- */}
+                <section className="identity-footer">
+                    <div className="id-rank" style={{ color: statusColor }}>{statusTitle}</div>
+                    <div className="id-streak">
+                        <span className="fire-icon">🔥</span> {streak} DAY STREAK
+                    </div>
                 </section>
 
                 {/* --- VIRAL FOOTER --- */}
                 <footer className="card-footer">
                     <div className="footer-content">
                         <div className="cta-text">
-                            <h2>INITIALIZE<br />YOUR TWIN</h2>
-                            <p>Available on iOS & Android</p>
+                            <h2>COMPARE<br />YOUR STATS</h2>
+                            <p>Scan to challenge me</p>
                         </div>
                         <div className="qr-box">
-                            {/* Static QR for stability */}
                             <img
-                                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://optimalapp.com/download&color=000000&bgcolor=ffffff&margin=0"
-                                alt="Get App"
+                                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://optimalapp.com/compare&color=000000&bgcolor=ffffff&margin=0"
+                                alt="Challenge Me"
                             />
                         </div>
                     </div>
