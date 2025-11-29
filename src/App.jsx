@@ -11,41 +11,18 @@ import BodyWidget from './components/BodyWidget';
 import KnowledgeCardModal from './components/KnowledgeCardModal';
 import { soundManager } from './utils/SoundManager';
 import { Shield, Skull } from 'lucide-react';
+import { useHabits } from './hooks/useHabits';
+import { useGamification } from './hooks/useGamification';
 
 function App() {
-  const [habits, setHabits] = useState(() => {
-    const saved = localStorage.getItem('habits_def');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [history, setHistory] = useState(() => {
-    const saved = localStorage.getItem('habit_history');
-    return saved ? JSON.parse(saved) : {};
-  });
+  const { habits, setHabits, history, setHistory, addHabit, editHabit, deleteHabit, triggerHaptic } = useHabits();
+  const { streak, calculateHabitStreak, hardcoreMode, setHardcoreMode, today } = useGamification(history, habits);
 
   const [showKnowledgeCard, setShowKnowledgeCard] = useState(false);
   const [isPumped, setIsPumped] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
 
-  // HARDCORE MODE STATE
-  const [hardcoreMode, setHardcoreMode] = useState(() => {
-    const saved = localStorage.getItem('hardcore_mode');
-    return saved ? JSON.parse(saved) : false;
-  });
-
-  useEffect(() => {
-    localStorage.setItem('hardcore_mode', JSON.stringify(hardcoreMode));
-  }, [hardcoreMode]);
-
   const shareRef = useRef(null);
-
-  useEffect(() => {
-    localStorage.setItem('habits_def', JSON.stringify(habits));
-  }, [habits]);
-
-  useEffect(() => {
-    localStorage.setItem('habit_history', JSON.stringify(history));
-  }, [history]);
 
   // Initialize Audio Context on first interaction
   useEffect(() => {
@@ -54,58 +31,26 @@ function App() {
     return () => window.removeEventListener('click', initAudio);
   }, []);
 
-  const getTodayStr = () => {
-    const date = new Date();
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-  };
+  // --- PERMADEATH LOGIC (Moved from hook for side effects) ---
+  useEffect(() => {
+    if (hardcoreMode) {
+      const hasHistory = Object.keys(history).length > 0;
 
-  const today = getTodayStr();
+      if (streak === 0 && hasHistory) {
+        const dates = Object.keys(history).sort();
+        const lastDateStr = dates[dates.length - 1];
 
-  const calculateStreak = () => {
-    let streak = 0;
-    const todayDate = new Date();
-
-    for (let i = 0; i < 365; i++) {
-      const d = new Date();
-      d.setDate(todayDate.getDate() - i);
-      const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-
-      const completedIds = history[dateStr] || [];
-
-      // Filter habits that existed on this date
-      const endOfDay = new Date(d);
-      endOfDay.setHours(23, 59, 59, 999);
-
-      const relevantHabits = habits.filter(h => {
-        if (i === 0) return true;
-        if (typeof h.id !== 'number') return true;
-        return h.id <= endOfDay.getTime();
-      });
-
-      if (relevantHabits.length === 0) {
-        if (i === 0) continue;
-        break;
-      }
-
-      const allCompleted = relevantHabits.every(h => completedIds.includes(h.id));
-
-      if (allCompleted) {
-        streak++;
-      } else if (i === 0) {
-        continue;
-      } else {
-        break;
+        if (lastDateStr && lastDateStr !== today) {
+          setHistory({});
+          soundManager.playGameOver();
+          setTimeout(() => alert("☠️ HARDCORE MODE: YOU MISSED A DAY. PROTOCOL RESET. ☠️"), 100);
+        }
       }
     }
-    return streak;
-  };
+  }, [streak, hardcoreMode, history, today, setHistory]);
 
-  const streak = calculateStreak();
-
-  // --- PERMADEATH LOGIC ---
   const toggleHardcore = () => {
     if (!hardcoreMode) {
-      // Enabling Hardcore
       const confirm = window.confirm("⚠️ WARNING: HARDCORE MODE ⚠️\n\nIf you miss ONE day, your entire progress (Streak & Level) will be WIPED.\n\nAre you sure you have what it takes?");
       if (confirm) {
         setHardcoreMode(true);
@@ -113,87 +58,9 @@ function App() {
         triggerHaptic('heavy');
       }
     } else {
-      // Disabling Hardcore
       setHardcoreMode(false);
       soundManager.playThud();
     }
-  };
-
-  useEffect(() => {
-    if (hardcoreMode) {
-      // If streak is 0 AND we have history (meaning we started but failed), WIPE IT.
-      const hasHistory = Object.keys(history).length > 0;
-
-      if (streak === 0 && hasHistory) {
-        // Check if we actually missed yesterday (or before)
-        const dates = Object.keys(history).sort();
-        const lastDateStr = dates[dates.length - 1];
-
-        // If last active date is NOT today, and streak is 0, it means we broke the chain.
-        if (lastDateStr && lastDateStr !== today) {
-          // PERMADEATH TRIGGER
-          setHistory({});
-          soundManager.playGameOver();
-          // Use a small timeout to ensure UI renders before alert blocks it (though alert blocks anyway)
-          setTimeout(() => alert("☠️ HARDCORE MODE: YOU MISSED A DAY. PROTOCOL RESET. ☠️"), 100);
-        }
-      }
-    }
-  }, [streak, hardcoreMode, history, today]);
-  // ------------------------
-
-  const calculateHabitStreak = (habitId) => {
-    let streak = 0;
-    const todayDate = new Date();
-
-    for (let i = 0; i < 365; i++) {
-      const d = new Date();
-      d.setDate(todayDate.getDate() - i);
-      const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-
-      // Check if habit existed
-      const endOfDay = new Date(d);
-      endOfDay.setHours(23, 59, 59, 999);
-      if (typeof habitId === 'number' && habitId > endOfDay.getTime()) {
-        break; // Habit didn't exist yet
-      }
-
-      const isCompleted = (history[dateStr] || []).includes(habitId);
-
-      if (isCompleted) {
-        streak++;
-      } else {
-        if (i === 0) continue;
-        break;
-      }
-    }
-    return streak;
-  };
-
-  const triggerHaptic = (type = 'light') => {
-    if (navigator.vibrate) {
-      const patterns = {
-        light: 10,
-        medium: 20,
-        heavy: 40,
-        success: [10, 30, 10]
-      };
-      navigator.vibrate(patterns[type] || 10);
-    }
-  };
-
-  const addHabit = (text, category = 'training') => {
-    setHabits([...habits, { id: Date.now(), text, category }]);
-    triggerHaptic('light');
-  };
-
-  const editHabit = (id, newText) => {
-    setHabits(habits.map(h => h.id === id ? { ...h, text: newText } : h));
-  };
-
-  const deleteHabit = (id) => {
-    setHabits(habits.filter(h => h.id !== id));
-    triggerHaptic('medium');
   };
 
   const toggleHabit = (id) => {
@@ -230,7 +97,6 @@ function App() {
 
         // Check for Perfect Day
         if (habits.length > 0 && newTodayCompleted.length === habits.length) {
-          // Check if already claimed today (using same key as mystery box for simplicity)
           const lastCardDate = prev.lastMysteryBoxDate;
           if (lastCardDate !== currentToday) {
             shouldTriggerCard = true;

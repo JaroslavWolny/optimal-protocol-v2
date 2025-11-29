@@ -151,7 +151,7 @@ const BodyWidget = ({ stats, isPumped = false }) => {
             <Canvas
                 camera={{ position: [0, 0, 4.5], fov: 45 }} // Fixnutá kamera, aby se vešel
                 dpr={[1, 2]} // Optimalizace pro retina displeje
-                gl={{ antialias: false, alpha: true }}
+                gl={{ antialias: false, alpha: true, preserveDrawingBuffer: true }}
             >
                 {/* Osvětlení */}
                 <ambientLight intensity={isGodMode ? 1.5 : 0.5} />
