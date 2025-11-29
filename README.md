@@ -1,4 +1,4 @@
-# ⚡ OPTIMAL PROTOCOL // GOD MODE UPDATE
+# ⚡ OPTIMAL PROTOCOL // VISUAL OVERHAUL (v3.0)
 
 **THE WORLD'S FIRST LIVING HABIT PROTOCOL.**
 
@@ -6,47 +6,51 @@
 
 **OPTIMAL PROTOCOL** is not a checklist. It is a **Cybernetic Life Simulator** linked directly to your daily discipline. You are the Operator. The **Cyber-Construct** is your digital twin. If you slack off, it glitches and decays. If you dominate, it evolves into a **GODLIKE** state.
 
+**v3.0 UPDATE:** We have abandoned abstract geometry for a raw, **Retro PS1 / Metal Gear Solid** aesthetic.
+
 ---
 
-## 🤖 THE CYBER-CONSTRUCT (v3.0)
+## 💀 HARDCORE MODE (PERMADEATH)
 
-We have transcended simple 2D avatars. Your twin is now a fully procedural **3D Cyborg** built from geometric primitives and hard-light energy.
+**⚠️ WARNING: NOT FOR CIVILIANS.**
 
-### 1. 🧬 PROCEDURAL EVOLUTION
-- **Dynamic Geometry:** The Construct is built from raw data. It breathes, floats, and reacts to your presence.
-- **Adaptive Coloring:**
-  - **🟢 NEON GREEN:** Training Focus (Power)
-  - **🔵 CYBER BLUE:** Recovery Focus (Efficiency)
-  - **🟡 AMBER:** Knowledge Focus (Intellect)
-  - **🔴 CRITICAL RED:** System Failure (Low Integrity)
+- **The Stakes:** If you miss **ONE DAY**, your entire Streak and Level are **WIPED**.
+- **Visual Override:** The interface shifts to a gritty, blood-red theme with **Gothic Typography (Pirata One)** and analog noise interference.
+- **Audio Feedback:** Heavy industrial sounds and alarms.
 
-### 2. 🌟 GOD MODE (NEW)
-Achieve **90%+ Integrity** to unlock the ultimate state:
-- **Golden Ascension:** The Construct transforms into pure Gold (`#FFD700`).
-- **Divine Aura:** Bloom intensity maximizes, creating a holy glow.
-- **Ascension Float:** Gravity is defied as the avatar floats higher.
-- **Particle Storm:** A swarm of golden energy surrounds your twin.
+---
 
-### 3. ⚡ POWER SURGE
-- **Real-time Feedback:** Completing a habit triggers an immediate **Power Surge**.
-- **System Overdrive:** The avatar spins faster, glows brighter, and emits shockwaves of particles.
+## 🤖 THE AVATAR SYSTEM (v3.0)
+
+Your twin is no longer a sphere. It is a **Low-Poly Entity** that physically transforms based on your discipline.
+
+### 1. 🧬 EVOLUTIONARY STAGES
+- **💀 STAGE 0: WITHERED (Low Integrity)**
+  - A skeleton or emaciated form.
+  - Environment: **Dirty Dungeon**. Dark, dusty, red emergency lighting.
+- **👤 STAGE 1: OPERATIVE (Normal)**
+  - Base human musculature. Ready for combat.
+  - Environment: **Standard Quarters**. Neutral lighting.
+- **🦾 STAGE 2: GODLIKE (50+ Streak)**
+  - Full Cyborg Augmentation. Golden armor, neon veins.
+  - Environment: **High-Tech Laboratory**. Clean, cold, clinical perfection.
+
+### 2. 📺 PS1 VISUAL ENGINE
+- **Pixelation Shader:** The entire 3D scene is downsampled to mimic 32-bit console graphics.
+- **No Anti-Aliasing:** Raw, jagged edges for maximum retro authenticity.
+- **CRT Effects:** Scanlines, noise, and chromatic aberration.
 
 ---
 
 ## 🖥️ TACTICAL INTERFACE
 
-### 1. 🔋 TACTICAL STREAK CORE
-- **System Chip Design:** A compact, glassmorphic reactor core in the header.
-- **Live Status:** Pulses with an amber "fuel" glow to indicate active streak.
-- **Minimalist HUD:** Designed to look like military-grade hardware, not a toy.
+### 1. 🔋 DYNAMIC TYPOGRAPHY
+- **Safe Mode:** Uses **'Unbounded'** – a wide, aggressive modern sans-serif.
+- **Hardcore Mode:** Shifts to **'Pirata One'** – a sharp, medieval blackletter font.
 
 ### 2. 🏆 VIRAL IDENTITY SYSTEM
 - **Tactical Share Card:** A futuristic diagnostic report designed for Instagram Stories (9:16).
-- **Rank System:**
-  - **GODLIKE (100%):** Maximum Efficiency. Neon Green Glow.
-  - **VANGUARD (80-99%):** High Performance. Cyber Blue.
-  - **OPERATIVE (40-79%):** System Stable. Gold.
-  - **ROOKIE (<40%):** Low Energy. Grey.
+- **Proof of Work:** One-click generation of a visual overlay to prove your daily completion.
 
 ---
 
@@ -55,7 +59,7 @@ Achieve **90%+ Integrity** to unlock the ultimate state:
 Built with the bleeding edge of web technology:
 - **React 19** - The Neural Network
 - **Three.js / React Three Fiber** - The 3D Engine
-- **Post-Processing** - Bloom, Glitch, Noise, and God Rays
+- **Post-Processing** - Pixelation, Bloom, Glitch, Noise
 - **Framer Motion** - The Physics Engine
 - **Vite** - Hypersonic Build Speeds
 
