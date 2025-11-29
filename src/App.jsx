@@ -289,7 +289,7 @@ function App() {
 
       <div className="glass-panel main-panel">
 
-        <BodyWidget stats={currentStats} isAllDone={isAllDone} isPumped={isPumped} streak={streak} />
+        <BodyWidget stats={currentStats} isAllDone={isAllDone} isPumped={isPumped} streak={streak} hardcoreMode={hardcoreMode} />
 
         {habits.length === 0 ? (
           <ProtocolSelector onSelect={handleProtocolSelect} />

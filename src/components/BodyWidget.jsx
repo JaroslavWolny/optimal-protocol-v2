@@ -42,7 +42,7 @@ const RetroLimb = ({ position, args, color, scale = [1, 1, 1], glow = false, edg
 };
 
 // --- THE DOOM SLAYER (Procedural Avatar) ---
-const DoomAvatar = ({ stats, integrity, stage }) => {
+const DoomAvatar = ({ stats, integrity, stage, hardcoreMode }) => {
     const group = useRef();
 
     // Stats Mapping
@@ -57,32 +57,42 @@ const DoomAvatar = ({ stats, integrity, stage }) => {
     const headIntel = 0.9 + (know * 0.3);   // Hlava
 
     // --- MODE VISUALS CONFIG ---
-    const isDeathMode = integrity < 0.3;
     const isGodMode = stage === "GODLIKE";
 
     let primaryColor, skinColor, coreColor, edgeColor, eyeColor;
 
-    if (isGodMode) {
-        // GOD MODE: Golden Saint (Epický, zářivý)
-        primaryColor = '#ffd700'; // Gold
-        skinColor = '#fffacd';    // Lemon Chiffon (Glowing skin)
-        coreColor = '#00ffff';    // Cyan Core
-        edgeColor = '#b8860b';    // Dark Goldenrod Edges
-        eyeColor = '#00ffff';     // Cyan Eyes
-    } else if (isDeathMode) {
-        // DEATH MODE: Cyber-Necromancer (Temný, ale viditelný díky neonům)
-        primaryColor = '#1a1a2e'; // Dark Navy/Purple Armor
-        skinColor = '#300000';    // Dark Red/Dried Blood Skin
-        coreColor = '#ff0000';    // Pure Red Core
-        edgeColor = '#ff003c';    // Neon Red Edges (Tron style)
-        eyeColor = '#ffffff';     // White Dead Eyes
+    if (hardcoreMode) {
+        if (isGodMode) {
+            // DEATH GOD: THE VOID WALKER (Epic, Out of Box)
+            primaryColor = '#050505'; // Vantablack Armor
+            skinColor = '#2a0a2a';    // Dark Matter Skin
+            coreColor = '#ffffff';    // Blinding White Singularity
+            edgeColor = '#b026ff';    // Neon Purple Event Horizon
+            eyeColor = '#ff0000';     // Sith Lord Eyes
+        } else {
+            // DEATH NORMAL: CYBER-NECROMANCER
+            primaryColor = '#1a1a2e'; // Dark Navy/Purple Armor
+            skinColor = '#300000';    // Dark Red/Dried Blood Skin
+            coreColor = '#ff0000';    // Pure Red Core
+            edgeColor = '#ff003c';    // Neon Red Edges
+            eyeColor = '#ffffff';     // White Dead Eyes
+        }
     } else {
-        // SAFE MODE: Doom Marine (Klasika)
-        primaryColor = '#7c9670'; // Military Green
-        skinColor = '#e0a686';    // Human Skin
-        coreColor = rec > 0.8 ? '#33ff33' : (rec > 0.4 ? '#33cccc' : '#ff3333');
-        edgeColor = '#000000';    // Black Edges
-        eyeColor = '#ff3360';     // Red Visor/Eyes
+        if (isGodMode) {
+            // SAFE GOD: GOLDEN SAINT
+            primaryColor = '#ffd700'; // Gold
+            skinColor = '#fffacd';    // Lemon Chiffon (Glowing skin)
+            coreColor = '#00ffff';    // Cyan Core
+            edgeColor = '#b8860b';    // Dark Goldenrod Edges
+            eyeColor = '#00ffff';     // Cyan Eyes
+        } else {
+            // SAFE NORMAL: DOOM MARINE
+            primaryColor = '#7c9670'; // Military Green
+            skinColor = '#e0a686';    // Human Skin
+            coreColor = rec > 0.8 ? '#33ff33' : (rec > 0.4 ? '#33cccc' : '#ff3333');
+            edgeColor = '#000000';    // Black Edges
+            eyeColor = '#ff3360';     // Red Visor/Eyes
+        }
     }
 
     // --- RETRO ANIMATION LOOP ---
@@ -93,14 +103,14 @@ const DoomAvatar = ({ stats, integrity, stage }) => {
         const time = state.clock.elapsedTime;
         const snappedTime = Math.floor(time * FPS_LIMIT) / FPS_LIMIT;
 
-        // "Idle Bobbing" - vycentrováno (změněno z -1.2 na -0.8)
+        // "Idle Bobbing" - vycentrováno
         group.current.position.y = -0.8 + Math.sin(snappedTime * 2) * 0.05;
 
         // Jemné natočení do stran (Idle stance)
         group.current.rotation.y = Math.sin(snappedTime * 1) * 0.05;
     });
 
-    // Dynamic Leg Spacing to prevent overlap when huge
+    // Dynamic Leg Spacing
     const legSpacing = 0.22 * muscleScale;
 
     return (
@@ -109,8 +119,8 @@ const DoomAvatar = ({ stats, integrity, stage }) => {
             <group position={[0, 1.45, 0]} scale={headIntel}>
                 <RetroLimb args={[0.35, 0.4, 0.4]} color={primaryColor} edgeColor={edgeColor} /> {/* Helma */}
                 <RetroLimb args={[0.25, 0.12, 0.05]} color="#111" position={[0, 0, 0.18]} edgeColor={edgeColor} /> {/* Hledí */}
-                {/* Oči svítí podle Knowledge nebo v Death Mode */}
-                {(know > 0.5 || isDeathMode || isGodMode) && (
+                {/* Oči */}
+                {(know > 0.5 || hardcoreMode || isGodMode) && (
                     <>
                         <RetroLimb args={[0.04, 0.04, 0.05]} color={eyeColor} position={[0.08, 0, 0.19]} glow={true} />
                         <RetroLimb args={[0.04, 0.04, 0.05]} color={eyeColor} position={[-0.08, 0, 0.19]} glow={true} />
@@ -120,16 +130,16 @@ const DoomAvatar = ({ stats, integrity, stage }) => {
 
             {/* --- TRUP (Armor) --- */}
             <RetroLimb args={[0.9 + (str * 0.5), 0.6, 0.5]} color={primaryColor} position={[0, 0.9, 0]} edgeColor={edgeColor} /> {/* Hrudní plát */}
-            <RetroLimb args={[0.5 * coreBulk, 0.6, 0.35 * coreBulk]} color={isDeathMode ? '#000' : "#1a1a1a"} position={[0, 0.35, 0]} edgeColor={edgeColor} /> {/* Břicho (kevlar) */}
+            <RetroLimb args={[0.5 * coreBulk, 0.6, 0.35 * coreBulk]} color={hardcoreMode ? '#000' : "#1a1a1a"} position={[0, 0.35, 0]} edgeColor={edgeColor} /> {/* Břicho */}
 
-            {/* REAKTOR / SRDCE (Recovery Indicator) */}
+            {/* REAKTOR / SRDCE */}
             <RetroLimb args={[0.15, 0.15, 0.1]} color={coreColor} position={[0, 0.9, 0.26]} glow={true} />
 
-            {/* --- PAŽE (Guns) --- */}
+            {/* --- PAŽE --- */}
             {/* Levá */}
             <group position={[0.55 + (str * 0.25), 0.9, 0]}>
                 <RetroLimb args={[0.3 * muscleScale, 0.35, 0.3 * muscleScale]} color={primaryColor} position={[0, 0, 0]} edgeColor={edgeColor} /> {/* Rameno */}
-                <RetroLimb args={[0.22 * muscleScale, 0.7, 0.22 * muscleScale]} color={skinColor} position={[0, -0.5, 0]} edgeColor={edgeColor} /> {/* Biceps (odhalený) */}
+                <RetroLimb args={[0.22 * muscleScale, 0.7, 0.22 * muscleScale]} color={skinColor} position={[0, -0.5, 0]} edgeColor={edgeColor} /> {/* Biceps */}
                 <RetroLimb args={[0.25 * muscleScale, 0.3, 0.25 * muscleScale]} color="#333" position={[0, -0.9, 0]} edgeColor={edgeColor} /> {/* Rukavice */}
             </group>
             {/* Pravá */}
@@ -139,7 +149,7 @@ const DoomAvatar = ({ stats, integrity, stage }) => {
                 <RetroLimb args={[0.25 * muscleScale, 0.3, 0.25 * muscleScale]} color="#333" position={[0, -0.9, 0]} edgeColor={edgeColor} />
             </group>
 
-            {/* --- NOHY (Legs) --- */}
+            {/* --- NOHY --- */}
             <group position={[legSpacing, -0.1, 0]}>
                 <RetroLimb args={[0.3 * muscleScale, 1.1, 0.35 * muscleScale]} color={primaryColor} position={[0, -0.5, 0]} edgeColor={edgeColor} />
             </group>
@@ -151,7 +161,7 @@ const DoomAvatar = ({ stats, integrity, stage }) => {
 };
 
 // --- SCENE SETUP ---
-const BodyWidget = ({ stats, isPumped = false, streak = 0 }) => {
+const BodyWidget = ({ stats, isPumped = false, streak = 0, hardcoreMode = false }) => {
     const safeStats = stats || { training: 0, nutrition: 0, recovery: 0, knowledge: 0 };
     const integrity = (safeStats.training + safeStats.nutrition + safeStats.recovery + safeStats.knowledge) / 4;
     const isGodMode = integrity >= 0.9 && streak > 30;
@@ -204,7 +214,7 @@ const BodyWidget = ({ stats, isPumped = false, streak = 0 }) => {
                 {/* Environment - Simple Grid */}
                 <gridHelper args={[20, 20, 0x444444, 0x222222]} position={[0, -2.5, 0]} />
 
-                <DoomAvatar stats={safeStats} integrity={integrity} stage={stage} />
+                <DoomAvatar stats={safeStats} integrity={integrity} stage={stage} hardcoreMode={hardcoreMode} />
 
                 {/* POST PROCESSING - THE RETRO MAGIC */}
                 <EffectComposer disableNormalPass>
