@@ -25,8 +25,7 @@ function App() {
   const [isPumped, setIsPumped] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
 
-  // PROOF HUD STATE
-  const [showProofHUD, setShowProofHUD] = useState(false);
+  // REFS
   const proofRef = useRef(null);
   const shareRef = useRef(null);
 
@@ -159,17 +158,16 @@ function App() {
     });
   };
 
-  const handleShare = () => {
-    setShowProofHUD(true);
-  };
-
-  const downloadProof = async () => {
+  const handleShare = async () => {
+    // Trigger download directly
     if (proofRef.current) {
-      // Wait a bit for image to render
-      await new Promise(resolve => setTimeout(resolve, 500));
+      soundManager.playCharge(); // Feedback start
+
+      // Wait a bit for any state updates to settle
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const canvas = await html2canvas(proofRef.current, {
-        backgroundColor: null,
+        backgroundColor: null, // Transparent background
         scale: 2,
         useCORS: true
       });
@@ -180,9 +178,7 @@ function App() {
       link.download = `optimal-overlay-${today}.png`;
       link.click();
 
-      // Reset
-      setShowProofHUD(false);
-      soundManager.playCharge(); // Success sound
+      triggerHaptic('success');
     }
   };
 
@@ -255,49 +251,10 @@ function App() {
   return (
     <div className={`app-container ${isShaking ? 'shake-effect' : ''} ${pulseClass}`}>
 
-      {/* Proof HUD Modal */}
-      {showProofHUD && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          zIndex: 10000,
-          background: 'rgba(0,0,0,0.8)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backdropFilter: 'blur(5px)'
-        }}>
-          <div style={{
-            transform: 'scale(0.35)',
-            transformOrigin: 'center center',
-            border: '2px dashed #555',
-            backgroundImage: 'linear-gradient(45deg, #222 25%, transparent 25%), linear-gradient(-45deg, #222 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #222 75%), linear-gradient(-45deg, transparent 75%, #222 75%)',
-            backgroundSize: '20px 20px',
-            backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px'
-          }}>
-            <ProofHUD ref={proofRef} streak={streak} />
-          </div>
-
-          <div style={{ marginTop: '20px', display: 'flex', gap: '20px', zIndex: 10001 }}>
-            <button
-              onClick={() => setShowProofHUD(false)}
-              style={{ padding: '15px 30px', background: '#333', color: 'white', border: '1px solid #555', borderRadius: '100px', fontSize: '16px', cursor: 'pointer', fontFamily: 'Outfit' }}
-            >
-              CANCEL
-            </button>
-            <button
-              onClick={downloadProof}
-              style={{ padding: '15px 30px', background: '#39FF14', color: 'black', border: 'none', borderRadius: '100px', fontSize: '16px', fontWeight: '800', cursor: 'pointer', fontFamily: 'Outfit', letterSpacing: '1px' }}
-            >
-              DOWNLOAD OVERLAY
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Hidden Proof HUD for Generation */}
+      <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
+        <ProofHUD ref={proofRef} streak={streak} />
+      </div>
 
       <div className="header-row">
         <div className="app-brand">
