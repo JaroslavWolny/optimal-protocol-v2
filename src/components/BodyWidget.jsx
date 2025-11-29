@@ -62,8 +62,16 @@ const DoomAvatar = ({ stats, integrity, stage }) => {
     const demonRed = '#ff3360';   // Brighter Hell Energy
     const godGold = '#ffd700';    // God Mode
 
-    const primaryColor = stage === "GODLIKE" ? godGold : (integrity < 0.3 ? '#4a4a4a' : armorGreen);
-    const coreColor = rec > 0.8 ? '#33ff33' : (rec > 0.4 ? '#33cccc' : '#ff3333'); // Health pack colors
+    // Death Mode Palette
+    const deathArmor = '#111111'; // Pitch black armor
+    const deathFlesh = '#4a4a4a'; // Necrotic grey skin
+    const deathGlow = '#ff0000';  // Pure red danger
+
+    const isDeathMode = integrity < 0.3;
+
+    const primaryColor = stage === "GODLIKE" ? godGold : (isDeathMode ? deathArmor : armorGreen);
+    const skinColor = isDeathMode ? deathFlesh : fleshColor;
+    const coreColor = rec > 0.8 ? '#33ff33' : (rec > 0.4 ? '#33cccc' : (isDeathMode ? deathGlow : '#ff3333'));
 
     // --- RETRO ANIMATION LOOP ---
     useFrame((state) => {
@@ -80,24 +88,27 @@ const DoomAvatar = ({ stats, integrity, stage }) => {
         group.current.rotation.y = Math.sin(snappedTime * 1) * 0.05;
     });
 
+    // Dynamic Leg Spacing to prevent overlap when huge
+    const legSpacing = 0.22 * muscleScale;
+
     return (
         <group ref={group}>
             {/* --- HLAVA (Helmet) --- */}
             <group position={[0, 1.45, 0]} scale={headIntel}>
                 <RetroLimb args={[0.35, 0.4, 0.4]} color={primaryColor} /> {/* Helma */}
                 <RetroLimb args={[0.25, 0.12, 0.05]} color="#000" position={[0, 0, 0.18]} /> {/* Hledí */}
-                {/* Oči svítí podle Knowledge */}
-                {know > 0.5 && (
+                {/* Oči svítí podle Knowledge nebo v Death Mode */}
+                {(know > 0.5 || isDeathMode) && (
                     <>
-                        <RetroLimb args={[0.04, 0.04, 0.05]} color={demonRed} position={[0.08, 0, 0.19]} glow={true} />
-                        <RetroLimb args={[0.04, 0.04, 0.05]} color={demonRed} position={[-0.08, 0, 0.19]} glow={true} />
+                        <RetroLimb args={[0.04, 0.04, 0.05]} color={isDeathMode ? deathGlow : demonRed} position={[0.08, 0, 0.19]} glow={true} />
+                        <RetroLimb args={[0.04, 0.04, 0.05]} color={isDeathMode ? deathGlow : demonRed} position={[-0.08, 0, 0.19]} glow={true} />
                     </>
                 )}
             </group>
 
             {/* --- TRUP (Armor) --- */}
             <RetroLimb args={[0.9 + (str * 0.5), 0.6, 0.5]} color={primaryColor} position={[0, 0.9, 0]} /> {/* Hrudní plát */}
-            <RetroLimb args={[0.5 * coreBulk, 0.6, 0.35 * coreBulk]} color="#1a1a1a" position={[0, 0.35, 0]} /> {/* Břicho (kevlar) */}
+            <RetroLimb args={[0.5 * coreBulk, 0.6, 0.35 * coreBulk]} color={isDeathMode ? '#000' : "#1a1a1a"} position={[0, 0.35, 0]} /> {/* Břicho (kevlar) */}
 
             {/* REAKTOR / SRDCE (Recovery Indicator) */}
             <RetroLimb args={[0.15, 0.15, 0.1]} color={coreColor} position={[0, 0.9, 0.26]} glow={true} />
@@ -106,32 +117,23 @@ const DoomAvatar = ({ stats, integrity, stage }) => {
             {/* Levá */}
             <group position={[0.55 + (str * 0.25), 0.9, 0]}>
                 <RetroLimb args={[0.3 * muscleScale, 0.35, 0.3 * muscleScale]} color={primaryColor} position={[0, 0, 0]} /> {/* Rameno */}
-                <RetroLimb args={[0.22 * muscleScale, 0.7, 0.22 * muscleScale]} color={fleshColor} position={[0, -0.5, 0]} /> {/* Biceps (odhalený) */}
+                <RetroLimb args={[0.22 * muscleScale, 0.7, 0.22 * muscleScale]} color={skinColor} position={[0, -0.5, 0]} /> {/* Biceps (odhalený) */}
                 <RetroLimb args={[0.25 * muscleScale, 0.3, 0.25 * muscleScale]} color="#333" position={[0, -0.9, 0]} /> {/* Rukavice */}
             </group>
             {/* Pravá */}
             <group position={[-(0.55 + (str * 0.25)), 0.9, 0]}>
                 <RetroLimb args={[0.3 * muscleScale, 0.35, 0.3 * muscleScale]} color={primaryColor} position={[0, 0, 0]} />
-                <RetroLimb args={[0.22 * muscleScale, 0.7, 0.22 * muscleScale]} color={fleshColor} position={[0, -0.5, 0]} />
+                <RetroLimb args={[0.22 * muscleScale, 0.7, 0.22 * muscleScale]} color={skinColor} position={[0, -0.5, 0]} />
                 <RetroLimb args={[0.25 * muscleScale, 0.3, 0.25 * muscleScale]} color="#333" position={[0, -0.9, 0]} />
             </group>
 
             {/* --- NOHY (Legs) --- */}
-            <group position={[0.22, -0.1, 0]}>
+            <group position={[legSpacing, -0.1, 0]}>
                 <RetroLimb args={[0.3 * muscleScale, 1.1, 0.35 * muscleScale]} color={primaryColor} position={[0, -0.5, 0]} />
             </group>
-            <group position={[-0.22, -0.1, 0]}>
+            <group position={[-legSpacing, -0.1, 0]}>
                 <RetroLimb args={[0.3 * muscleScale, 1.1, 0.35 * muscleScale]} color={primaryColor} position={[0, -0.5, 0]} />
             </group>
-
-            {/* --- ZBRAŇ (Symbol disciplíny) --- */}
-            {/* Objeví se jen pokud máš Training > 50% */}
-            {str > 0.5 && (
-                <group position={[0.8 + (str * 0.2), 0, 0.4]} rotation={[-0.5, 0, 0]}>
-                    <RetroLimb args={[0.15, 0.8, 0.15]} color="#111" /> {/* Hlaveň */}
-                    <RetroLimb args={[0.16, 0.16, 0.16]} color={demonRed} position={[0, 0.35, 0]} glow={true} /> {/* Ústí */}
-                </group>
-            )}
         </group>
     );
 };
