@@ -10,6 +10,7 @@ import ShareCard from './components/ShareCard';
 import BodyWidget from './components/BodyWidget';
 import KnowledgeCardModal from './components/KnowledgeCardModal';
 import ProofHUD from './components/ProofHUD';
+import ProtocolSelector from './components/ProtocolSelector';
 import { soundManager } from './utils/SoundManager';
 import { notificationManager } from './utils/NotificationManager';
 import { Shield, Skull } from 'lucide-react';
@@ -78,6 +79,22 @@ function App() {
       setHardcoreMode(false);
       soundManager.playThud();
     }
+  };
+
+  const handleProtocolSelect = (newHabits) => {
+    const habitsWithIds = newHabits.map((h, index) => ({
+      ...h,
+      id: Date.now() + index // Ensure unique IDs
+    }));
+    setHabits(habitsWithIds);
+    soundManager.playCharge();
+    triggerHaptic('heavy');
+    confetti({
+      particleCount: 150,
+      spread: 100,
+      origin: { y: 0.6 },
+      colors: ['#39FF14', '#ffffff']
+    });
   };
 
   const toggleHabit = (id) => {
@@ -314,14 +331,19 @@ function App() {
 
         <BodyWidget stats={currentStats} isAllDone={isAllDone} isPumped={isPumped} />
 
-
-        <AddHabit onAdd={addHabit} />
-        <HabitList
-          habits={todayHabits}
-          onToggle={toggleHabit}
-          onEdit={editHabit}
-          onDelete={deleteHabit}
-        />
+        {habits.length === 0 ? (
+          <ProtocolSelector onSelect={handleProtocolSelect} />
+        ) : (
+          <>
+            <AddHabit onAdd={addHabit} />
+            <HabitList
+              habits={todayHabits}
+              onToggle={toggleHabit}
+              onEdit={editHabit}
+              onDelete={deleteHabit}
+            />
+          </>
+        )}
 
         <Calendar history={history} habits={habits} />
       </div>
