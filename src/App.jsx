@@ -11,6 +11,7 @@ import BodyWidget from './components/BodyWidget';
 import KnowledgeCardModal from './components/KnowledgeCardModal';
 import ProofHUD from './components/ProofHUD';
 import ProtocolSelector from './components/ProtocolSelector';
+import IdentityInitialization from './components/Auth/IdentityInitialization';
 import { soundManager } from './utils/SoundManager';
 import { notificationManager } from './utils/NotificationManager';
 import { Shield, Skull } from 'lucide-react';
@@ -18,7 +19,19 @@ import { useHabits } from './hooks/useHabits';
 import { useGamification } from './hooks/useGamification';
 
 function App() {
-  const { habits, setHabits, history, setHistory, addHabit, editHabit, deleteHabit, triggerHaptic } = useHabits();
+  const {
+    habits,
+    history,
+    user,
+    loading,
+    addHabit,
+    editHabit,
+    deleteHabit,
+    toggleCompletion,
+    setHabitsBulk,
+    triggerHaptic
+  } = useHabits();
+
   const { streak, calculateHabitStreak, hardcoreMode, setHardcoreMode, today } = useGamification(history, habits);
 
   const [showKnowledgeCard, setShowKnowledgeCard] = useState(false);
@@ -48,7 +61,7 @@ function App() {
     };
   }, [habits, history]);
 
-  // --- PERMADEATH LOGIC (Moved from hook for side effects) ---
+  // --- PERMADEATH LOGIC ---
   useEffect(() => {
     if (hardcoreMode) {
       document.body.classList.add('hardcore-active');
@@ -59,15 +72,20 @@ function App() {
         const lastDateStr = dates[dates.length - 1];
 
         if (lastDateStr && lastDateStr !== today) {
-          setHistory({});
+          // In Supabase version, we might need a way to reset history.
+          // For now, we just alert. Resetting DB history is a heavy operation.
+          // Maybe we just reset the streak visually or sound?
+          // The original code did setHistory({}).
+          // We can't easily wipe the DB logs here without a specific function.
+          // For Phase 1, let's just play the sound and alert.
           soundManager.playGameOver();
-          setTimeout(() => alert("☠️ HARDCORE MODE: YOU MISSED A DAY. PROTOCOL RESET. ☠️"), 100);
+          // setTimeout(() => alert("☠️ HARDCORE MODE: YOU MISSED A DAY. PROTOCOL RESET. ☠️"), 100);
         }
       }
     } else {
       document.body.classList.remove('hardcore-active');
     }
-  }, [streak, hardcoreMode, history, today, setHistory]);
+  }, [streak, hardcoreMode, history, today]);
 
   const toggleHardcore = () => {
     if (!hardcoreMode) {
@@ -84,11 +102,7 @@ function App() {
   };
 
   const handleProtocolSelect = (newHabits) => {
-    const habitsWithIds = newHabits.map((h, index) => ({
-      ...h,
-      id: Date.now() + index // Ensure unique IDs
-    }));
-    setHabits(habitsWithIds);
+    setHabitsBulk(newHabits);
     soundManager.playCharge();
     triggerHaptic('heavy');
     confetti({
@@ -99,78 +113,66 @@ function App() {
     });
   };
 
-  const toggleHabit = (id) => {
-    const date = new Date();
-    const currentToday = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  const toggleHabit = async (id) => {
+    // 1. Check Strict Mode (Optimistic check)
+    const isCompleted = (history[today] || []).includes(id);
 
-    setHistory(prev => {
-      const todayCompleted = prev[currentToday] || [];
-      const isCompleted = todayCompleted.includes(id);
+    if (isCompleted) {
+      // STRICT MODE: Cannot undo a completed habit for the day
+      triggerHaptic('medium');
+      soundManager.playGlitch();
+      return;
+    }
 
-      let newTodayCompleted;
-      let shouldTriggerCard = false;
+    // 2. Call Hook
+    const nowCompleted = await toggleCompletion(id, today);
 
-      if (isCompleted) {
-        // STRICT MODE: Cannot undo a completed habit for the day
-        triggerHaptic('medium'); // Error vibration
-        soundManager.playGlitch();
-        return prev;
-      } else {
-        newTodayCompleted = [...todayCompleted, id];
-        triggerHaptic('success');
+    // 3. Effects (if successfully completed)
+    if (nowCompleted) {
+      triggerHaptic('success');
+      soundManager.playThud();
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 300);
 
-        // --- VITALITY EFFECTS ---
-        soundManager.playThud();
-        setIsShaking(true);
-        setTimeout(() => setIsShaking(false), 300);
-
-        const habit = habits.find(h => h.id === id);
-        if (habit && habit.category === 'training') {
-          setIsPumped(true);
-          setTimeout(() => setIsPumped(false), 2000);
-        }
-        // ------------------------
-
-        // Check for Perfect Day
-        if (habits.length > 0 && newTodayCompleted.length === habits.length) {
-          const lastCardDate = prev.lastMysteryBoxDate;
-          if (lastCardDate !== currentToday) {
-            shouldTriggerCard = true;
-          } else {
-            confetti({
-              particleCount: 100,
-              spread: 70,
-              origin: { y: 0.6 },
-              colors: ['#39FF14', '#ffffff'] // Neon Green & White
-            });
-            soundManager.playCharge();
-          }
-        }
+      const habit = habits.find(h => h.id === id);
+      if (habit && habit.category === 'training') {
+        setIsPumped(true);
+        setTimeout(() => setIsPumped(false), 2000);
       }
 
-      if (shouldTriggerCard) {
-        setTimeout(() => setShowKnowledgeCard(true), 500);
+      // Perfect Day Check
+      const currentCount = (history[today] || []).length; // Count BEFORE this toggle (from current render state)
+      // Since we just added one, total is currentCount + 1
+
+      if (habits.length > 0 && (currentCount + 1) === habits.length) {
+        // Check if we should trigger mystery box (simplified logic for now)
+        // Original logic checked lastMysteryBoxDate in history state.
+        // We don't have that in the new history object (it's just logs).
+        // We can just trigger confetti every time for now.
+
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#39FF14', '#ffffff']
+        });
         soundManager.playCharge();
-      }
 
-      return {
-        ...prev,
-        [currentToday]: newTodayCompleted,
-        lastMysteryBoxDate: shouldTriggerCard ? currentToday : prev.lastMysteryBoxDate
-      };
-    });
+        // Optional: Show Knowledge Card occasionally
+        if (Math.random() > 0.7) {
+          setTimeout(() => setShowKnowledgeCard(true), 500);
+        }
+      }
+    }
   };
 
   const handleShare = async () => {
-    // Trigger download directly
     if (proofRef.current) {
-      soundManager.playCharge(); // Feedback start
-
-      // Wait a bit for any state updates to settle
+      soundManager.playCharge();
       await new Promise(resolve => setTimeout(resolve, 100));
 
       const canvas = await html2canvas(proofRef.current, {
-        backgroundColor: null, // Transparent background
+        backgroundColor: null,
         scale: 2,
         useCORS: true
       });
@@ -196,15 +198,7 @@ function App() {
 
   // Calculate Stats for Dashboard
   const calculateStats = () => {
-    const stats = {
-      training: 0, // 0-1 for BodyWidget
-      nutrition: 0,
-      recovery: 0,
-      str: 0, // 0-100% for PerformanceStats
-      rec: 0,
-      know: 0
-    };
-
+    const stats = { training: 0, nutrition: 0, recovery: 0, str: 0, rec: 0, know: 0 };
     const categories = {
       training: { total: 0, done: 0 },
       nutrition: { total: 0, done: 0 },
@@ -213,43 +207,50 @@ function App() {
     };
 
     todayHabits.forEach(h => {
-      const cat = h.category || 'training'; // Default to training if missing
+      const cat = h.category || 'training';
       if (categories[cat]) {
         categories[cat].total++;
         if (h.completed) categories[cat].done++;
       }
     });
 
-    // Body Widget Stats (0-1)
     stats.training = categories.training.total > 0 ? categories.training.done / categories.training.total : 0;
     stats.nutrition = categories.nutrition.total > 0 ? categories.nutrition.done / categories.nutrition.total : 0;
     stats.recovery = categories.recovery.total > 0 ? categories.recovery.done / categories.recovery.total : 0;
     stats.knowledge = categories.knowledge.total > 0 ? categories.knowledge.done / categories.knowledge.total : 0;
 
-    // Performance Stats (0-100%)
-    // STR = Training + Knowledge (Discipline)
     const strTotal = categories.training.total + categories.knowledge.total;
     const strDone = categories.training.done + categories.knowledge.done;
     stats.str = strTotal > 0 ? (strDone / strTotal) * 100 : 0;
 
-    // REC = Recovery + Nutrition (Health)
     const recTotal = categories.recovery.total + categories.nutrition.total;
     const recDone = categories.recovery.done + categories.nutrition.done;
     stats.rec = recTotal > 0 ? (recDone / recTotal) * 100 : 0;
 
-    // KNOW = Knowledge (Focus)
     stats.know = categories.knowledge.total > 0 ? (categories.knowledge.done / categories.knowledge.total) * 100 : 0;
 
     return stats;
   };
 
   const currentStats = calculateStats();
-
-  // Determine Pulse Class
   const integrity = (currentStats.training + currentStats.nutrition + currentStats.recovery + currentStats.knowledge) / 4;
   let pulseClass = '';
   if (integrity < 0.4) pulseClass = 'pulse-red';
   else if (streak > 3 || integrity > 0.8) pulseClass = 'pulse-green';
+
+  // --- RENDER ---
+
+  if (loading) {
+    return (
+      <div className="app-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div className="glitch-text">INITIALIZING...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <IdentityInitialization />;
+  }
 
   return (
     <div className={`app-container ${isShaking ? 'shake-effect' : ''} ${pulseClass}`}>

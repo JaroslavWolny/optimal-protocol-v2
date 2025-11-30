@@ -5,7 +5,7 @@ import './HabitItem.css';
 
 const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editText, setEditText] = useState(habit.text);
+  const [editText, setEditText] = useState(habit.title || habit.text);
   const [showConfirm, setShowConfirm] = useState(false);
 
   // Category Configuration (Same as AddHabit)
@@ -82,7 +82,7 @@ const HabitItem = ({ habit, onToggle, onEdit, onDelete }) => {
           />
         ) : (
           <>
-            <div className="habit-text-v2">{habit.text}</div>
+            <div className="habit-text-v2">{habit.title || habit.text}</div>
             <div className="habit-meta">
               <span className="habit-category-label">{style.label}</span>
             </div>
