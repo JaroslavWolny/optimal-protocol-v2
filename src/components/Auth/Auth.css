@@ -3,15 +3,20 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    width: 100%;
+    height: 100vh;
+    /* Fixed height */
+    width: 100vw;
+    /* Fixed width */
     padding: 1rem;
     background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
     color: #fff;
     text-align: center;
-    position: relative;
-    overflow-y: auto;
-    /* Allow scrolling if needed */
+    position: fixed;
+    /* Anchor to screen */
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    /* Prevent scrolling */
 }
 
 .auth-card {
