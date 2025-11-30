@@ -3,20 +3,28 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
-    /* Fixed height */
+
+    /* Mobile Viewport Fix */
     width: 100vw;
-    /* Fixed width */
+    height: 100vh;
+    /* Fallback */
+    height: 100dvh;
+    /* Dynamic Viewport Height for Mobile */
+
     padding: 1rem;
     background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
     color: #fff;
     text-align: center;
+
+    /* Absolute positioning to ensure full coverage */
     position: fixed;
-    /* Anchor to screen */
     top: 0;
     left: 0;
+    right: 0;
+    bottom: 0;
+
     overflow: hidden;
-    /* Prevent scrolling */
+    z-index: 9999;
 }
 
 .auth-card {
@@ -33,8 +41,7 @@
     gap: 1.2rem;
     position: relative;
     z-index: 10;
-    margin: auto;
-    /* Center vertically if flex fails or scrolling */
+    /* margin: auto; Removed to allow flexbox centering */
 }
 
 .auth-title {
