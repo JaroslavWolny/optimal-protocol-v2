@@ -63,17 +63,6 @@ const IdentityInitialization = () => {
                 <div>
                     <h1 className="auth-title">Identity Initialization</h1>
                     <p className="auth-subtitle">Establish connection to the Optimal Protocol network.</p>
-                    {window.location.hostname === 'localhost' && (
-                        <div style={{ fontSize: '0.75rem', color: '#ffaa00', marginTop: '1rem', background: 'rgba(255, 170, 0, 0.1)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(255, 170, 0, 0.3)', textAlign: 'left' }}>
-                            <strong>⚠️ MOBILE LOGIN ISSUE DETECTED</strong>
-                            <ul style={{ margin: '0.5rem 0 0 1.2rem', lineHeight: '1.4' }}>
-                                <li>You are on <code>localhost</code>. Links sent from here point to localhost.</li>
-                                <li>Your phone cannot open localhost.</li>
-                                <li><b>FIX:</b> Open this app on your computer using your <b>Network IP</b> (e.g., <code>192.168.x.x:5173</code>) instead of localhost.</li>
-                                <li>Then request the link again.</li>
-                            </ul>
-                        </div>
-                    )}
                 </div>
 
                 <div className="social-buttons">
@@ -108,23 +97,44 @@ const IdentityInitialization = () => {
                         </button>
                     </motion.div>
                 ) : (
-                    <form className="email-input-group" onSubmit={handleMagicLink}>
-                        <input
-                            type="email"
-                            className="auth-input"
-                            placeholder="Enter your email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                        <button
-                            type="submit"
-                            className="magic-btn"
-                            disabled={loading}
-                        >
-                            {loading ? 'Sending...' : 'Send Magic Link'}
-                        </button>
-                    </form>
+                    window.location.hostname === 'localhost' ? (
+                        <div style={{ marginTop: '1rem', padding: '1rem', background: '#330000', border: '1px solid red', borderRadius: '12px', textAlign: 'left' }}>
+                            <h3 style={{ color: '#ff4444', margin: '0 0 0.5rem 0' }}>🛑 STOP</h3>
+                            <p style={{ fontSize: '0.9rem', color: '#ccc', marginBottom: '1rem' }}>
+                                You are on <b>localhost</b>. Magic Links created here will be broken on mobile.
+                            </p>
+                            <p style={{ fontSize: '0.9rem', color: '#fff' }}>
+                                Please click this link to switch to Network Mode:<br />
+                                <a
+                                    href={`http://${window.location.hostname === 'localhost' ? '192.168.0.182' : window.location.hostname}:5174`}
+                                    style={{ color: '#39FF14', fontWeight: 'bold', fontSize: '1.1rem', display: 'block', marginTop: '0.5rem' }}
+                                >
+                                    👉 http://192.168.0.182:5174
+                                </a>
+                            </p>
+                        </div>
+                    ) : (
+                        <form className="email-input-group" onSubmit={handleMagicLink}>
+                            <div style={{ fontSize: '0.7rem', color: '#666', marginBottom: '0.2rem' }}>
+                                Sending redirect for: <span style={{ color: '#39FF14' }}>{window.location.origin}</span>
+                            </div>
+                            <input
+                                type="email"
+                                className="auth-input"
+                                placeholder="Enter your email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                            />
+                            <button
+                                type="submit"
+                                className="magic-btn"
+                                disabled={loading}
+                            >
+                                {loading ? 'Sending...' : 'Send Magic Link'}
+                            </button>
+                        </form>
+                    )
                 )}
 
                 <div className="auth-footer">
