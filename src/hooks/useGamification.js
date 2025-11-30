@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { soundManager } from '../utils/SoundManager';
+import { useHabits } from './useHabits';
 
-export function useGamification(history, habits) {
+export function useGamification() {
+    const { history, habits } = useHabits();
+
     const [hardcoreMode, setHardcoreMode] = useState(() => {
         const saved = localStorage.getItem('hardcore_mode');
         return saved ? JSON.parse(saved) : false;
@@ -66,10 +68,7 @@ export function useGamification(history, habits) {
                 const lastDateStr = dates[dates.length - 1];
 
                 if (lastDateStr && lastDateStr !== today) {
-                    // Trigger Wipe externally via callback or effect in parent, 
-                    // but here we just return the status.
-                    // Actually, modifying history here would be circular if we passed setHistory.
-                    // Ideally, this hook should return a "shouldWipe" flag.
+                    // Logic handled in App.jsx or Context usually, but here we just calculate
                 }
             }
         }

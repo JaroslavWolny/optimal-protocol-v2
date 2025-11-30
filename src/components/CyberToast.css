@@ -1,0 +1,88 @@
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.cyber-toast {
+    pointer-events: auto;
+    width: 300px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid #333;
+    padding: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Share Tech Mono', monospace;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.cyber-toast.error {
+    border-color: #ff003c;
+    box-shadow: 0 0 10px rgba(255, 0, 60, 0.2);
+}
+
+.cyber-toast.success {
+    border-color: #39ff14;
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
+}
+
+.cyber-toast.info {
+    border-color: #00f3ff;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+}
+
+.toast-icon {
+    margin-top: 2px;
+}
+
+.cyber-toast.error .toast-icon {
+    color: #ff003c;
+}
+
+.cyber-toast.success .toast-icon {
+    color: #39ff14;
+}
+
+.cyber-toast.info .toast-icon {
+    color: #00f3ff;
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-title {
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.toast-message {
+    font-size: 0.8rem;
+    color: #ccc;
+    line-height: 1.2;
+}
+
+.toast-scanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.2) 51%);
+    background-size: 100% 4px;
+    pointer-events: none;
+    opacity: 0.5;
+}

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Mail, Chrome, Apple, Link as LinkIcon } from 'lucide-react';
+import { Mail, Chrome, Apple, Link as LinkIcon, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import './Auth.css';
 
@@ -9,19 +9,25 @@ const IdentityInitialization = () => {
     const [manualLink, setManualLink] = useState('');
     const [loading, setLoading] = useState(false);
     const [sent, setSent] = useState(false);
+    const [errorMsg, setErrorMsg] = useState(null);
+
+    // Auto-detect redirect URL
+    const getRedirectUrl = () => {
+        return window.location.origin;
+    };
 
     const handleSocialLogin = async (provider) => {
-        if (!supabase) {
-            alert("Supabase not configured!");
-            return;
-        }
+        setErrorMsg(null);
         try {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: provider,
+                options: {
+                    redirectTo: getRedirectUrl(),
+                }
             });
             if (error) throw error;
         } catch (error) {
-            alert(error.message);
+            setErrorMsg(error.message);
         }
     };
 
@@ -29,34 +35,39 @@ const IdentityInitialization = () => {
         e.preventDefault();
         if (!email) return;
         setLoading(true);
+        setErrorMsg(null);
+
         try {
-            // Ujisti se, že tady máš svou aktuální IP a Port (např. 5174 nebo 5173)
-            const redirectUrl = 'http://192.168.0.182:5174';
+            const redirectUrl = getRedirectUrl();
+            console.log("Sending Magic Link to:", email, "Redirect:", redirectUrl);
+
             const { error } = await supabase.auth.signInWithOtp({
                 email,
-                options: { emailRedirectTo: redirectUrl },
+                options: {
+                    emailRedirectTo: redirectUrl
+                },
             });
             if (error) throw error;
             setSent(true);
         } catch (error) {
-            alert(error.message);
+            setErrorMsg(error.message);
         } finally {
             setLoading(false);
         }
     };
 
-    // --- TOTO JE TA OPRAVENÁ FUNKCE ---
     const handleManualLogin = async () => {
         if (!manualLink) {
-            alert("Prosím vlož odkaz do políčka.");
+            setErrorMsg("Please paste the full link.");
             return;
         }
 
         try {
             setLoading(true);
-            console.log("Zpracovávám odkaz:", manualLink);
+            setErrorMsg(null);
+            console.log("Processing Manual Link...");
 
-            // 1. Získáme jen tu část s parametry (všechno za # nebo ?)
+            // Robust Hash/Query Parsing
             let paramsString = manualLink;
             if (manualLink.includes('#')) {
                 paramsString = manualLink.split('#')[1];
@@ -64,16 +75,14 @@ const IdentityInitialization = () => {
                 paramsString = manualLink.split('?')[1];
             }
 
-            // 2. Vytáhneme tokeny
             const params = new URLSearchParams(paramsString);
             const accessToken = params.get('access_token');
             const refreshToken = params.get('refresh_token');
 
             if (!accessToken || !refreshToken) {
-                throw new Error("V odkazu chybí přihlašovací údaje (tokeny).\n\nZkus zkopírovat odkaz z e-mailu znovu a ujisti se, že je celý.");
+                throw new Error("Invalid Link. Missing tokens. Ensure you copied the entire URL.");
             }
 
-            // 3. Pokusíme se nastavit session
             const { error } = await supabase.auth.setSession({
                 access_token: accessToken,
                 refresh_token: refreshToken,
@@ -81,78 +90,93 @@ const IdentityInitialization = () => {
 
             if (error) throw error;
 
-            // Úspěch! App.jsx to samo pozná a přepne obrazovku.
-            alert("✅ Úspěšně ověřeno! Vítej.");
+            // Success is handled by the onAuthStateChange listener in App/Context
 
         } catch (error) {
             console.error(error);
-            alert("❌ CHYBA PŘIHLÁŠENÍ:\n" + error.message);
+            setErrorMsg(error.message);
         } finally {
             setLoading(false);
         }
     };
-    // ----------------------------------
 
     return (
         <div className="auth-container">
             <div className="scan-line"></div>
             <motion.div className="auth-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <div>
-                    <h1 className="auth-title">Identity Initialization</h1>
-                    <p className="auth-subtitle">Establish connection.</p>
+                    <h1 className="auth-title">IDENTITY INITIALIZATION</h1>
+                    <p className="auth-subtitle">ESTABLISH NEURAL LINK</p>
                 </div>
+
+                {errorMsg && (
+                    <div className="auth-error" style={{
+                        background: 'rgba(255, 0, 60, 0.2)',
+                        border: '1px solid #FF003C',
+                        padding: '10px',
+                        borderRadius: '8px',
+                        marginBottom: '15px',
+                        color: '#FF003C',
+                        fontSize: '0.8rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px'
+                    }}>
+                        <AlertTriangle size={16} />
+                        {errorMsg}
+                    </div>
+                )}
 
                 {!sent ? (
                     <>
                         <div className="social-buttons">
                             <button className="social-btn" onClick={() => handleSocialLogin('google')}>
                                 <Chrome size={20} />
-                                Continue with Google
+                                GOOGLE
                             </button>
                             <button className="social-btn" onClick={() => handleSocialLogin('apple')}>
                                 <Apple size={20} />
-                                Continue with Apple
+                                APPLE
                             </button>
                         </div>
 
-                        <div className="divider">OR</div>
+                        <div className="divider">OR ACCESS CODE</div>
 
                         <form className="email-input-group" onSubmit={handleMagicLink}>
                             <input
                                 type="email"
                                 className="auth-input"
-                                placeholder="Enter your email"
+                                placeholder="ENTER EMAIL ADDRESS"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                             />
                             <button type="submit" className="magic-btn" disabled={loading}>
-                                {loading ? 'Sending...' : 'Send Magic Link'}
+                                {loading ? 'TRANSMITTING...' : 'SEND MAGIC LINK'}
                             </button>
                         </form>
                     </>
                 ) : (
                     <div className="success-message">
                         <Mail size={48} color="#39FF14" style={{ margin: '0 auto 1rem' }} />
-                        <h3>Link Sent!</h3>
-                        <p style={{ color: '#888', marginBottom: '1rem' }}>Check {email}</p>
+                        <h3>LINK TRANSMITTED</h3>
+                        <p style={{ color: '#888', marginBottom: '1rem' }}>Target: {email}</p>
 
-                        <div style={{ background: 'rgba(255,255,255,0.08)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(57, 255, 20, 0.2)' }}>
-                            <p style={{ fontSize: '0.8rem', color: '#fff', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-                                📲 FIX PRO PWA / MOBIL:
+                        <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(57, 255, 20, 0.2)' }}>
+                            <p style={{ fontSize: '0.8rem', color: '#39FF14', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                                ⚠️ MOBILE / PWA OVERRIDE:
                             </p>
-                            <p style={{ fontSize: '0.75rem', color: '#ccc', marginBottom: '0.8rem' }}>
-                                1. Jdi do mailu.<br />
-                                2. Podrž prst na tlačítku "Log In".<br />
-                                3. Zvol "Kopírovat odkaz" (Copy Link).<br />
-                                4. Vlož ho sem a klikni na ikonu řetězu.
+                            <p style={{ fontSize: '0.75rem', color: '#aaa', marginBottom: '0.8rem' }}>
+                                If the link fails to open the app:
+                                <br />1. Copy the link from email.
+                                <br />2. Paste it below to force authentication.
                             </p>
                             <div style={{ display: 'flex', gap: '8px' }}>
                                 <input
                                     type="text"
                                     className="auth-input"
                                     style={{ fontSize: '0.7rem', fontFamily: 'monospace' }}
-                                    placeholder="Sem vlož zkopírovaný odkaz..."
+                                    placeholder="PASTE LINK HERE..."
                                     value={manualLink}
                                     onChange={(e) => setManualLink(e.target.value)}
                                 />
@@ -160,6 +184,7 @@ const IdentityInitialization = () => {
                                     onClick={handleManualLogin}
                                     className="glass-button"
                                     style={{ padding: '0 12px', background: '#39FF14', color: 'black', border: 'none' }}
+                                    disabled={loading}
                                 >
                                     <LinkIcon size={18} />
                                 </button>
@@ -167,7 +192,7 @@ const IdentityInitialization = () => {
                         </div>
 
                         <button className="text-btn" onClick={() => setSent(false)} style={{ marginTop: '1rem', background: 'none', border: 'none', color: '#666' }}>
-                            Zpět
+                            ABORT
                         </button>
                     </div>
                 )}

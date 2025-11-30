@@ -12,11 +12,10 @@ import KnowledgeCardModal from './components/KnowledgeCardModal';
 import ProofHUD from './components/ProofHUD';
 import ProtocolSelector from './components/ProtocolSelector';
 import IdentityInitialization from './components/Auth/IdentityInitialization';
-import { soundManager } from './utils/SoundManager';
-import { notificationManager } from './utils/NotificationManager';
 import { Shield, Skull } from 'lucide-react';
 import { useHabits } from './hooks/useHabits';
 import { useGamification } from './hooks/useGamification';
+import { useAudio } from './context/AudioContext';
 
 function App() {
   const {
@@ -32,7 +31,8 @@ function App() {
     triggerHaptic
   } = useHabits();
 
-  const { streak, calculateHabitStreak, hardcoreMode, setHardcoreMode, today } = useGamification(history, habits);
+  const { streak, calculateHabitStreak, hardcoreMode, setHardcoreMode, today } = useGamification();
+  const { play } = useAudio();
 
   const [showKnowledgeCard, setShowKnowledgeCard] = useState(false);
   const [isPumped, setIsPumped] = useState(false);
@@ -41,25 +41,6 @@ function App() {
   // REFS
   const proofRef = useRef(null);
   const shareRef = useRef(null);
-
-  // Initialize Audio & Notifications on first interaction
-  useEffect(() => {
-    const initServices = () => {
-      soundManager.init();
-      notificationManager.requestPermission();
-    };
-    window.addEventListener('click', initServices, { once: true });
-
-    // Check for aggressive notifications every minute
-    const interval = setInterval(() => {
-      notificationManager.checkRoutine(habits, history);
-    }, 60000);
-
-    return () => {
-      window.removeEventListener('click', initServices);
-      clearInterval(interval);
-    };
-  }, [habits, history]);
 
   // --- PERMADEATH LOGIC ---
   useEffect(() => {
@@ -72,38 +53,31 @@ function App() {
         const lastDateStr = dates[dates.length - 1];
 
         if (lastDateStr && lastDateStr !== today) {
-          // In Supabase version, we might need a way to reset history.
-          // For now, we just alert. Resetting DB history is a heavy operation.
-          // Maybe we just reset the streak visually or sound?
-          // The original code did setHistory({}).
-          // We can't easily wipe the DB logs here without a specific function.
-          // For Phase 1, let's just play the sound and alert.
-          soundManager.playGameOver();
-          // setTimeout(() => alert("☠️ HARDCORE MODE: YOU MISSED A DAY. PROTOCOL RESET. ☠️"), 100);
+          play('gameover');
         }
       }
     } else {
       document.body.classList.remove('hardcore-active');
     }
-  }, [streak, hardcoreMode, history, today]);
+  }, [streak, hardcoreMode, history, today, play]);
 
   const toggleHardcore = () => {
     if (!hardcoreMode) {
       const confirm = window.confirm("⚠️ WARNING: HARDCORE MODE ⚠️\n\nIf you miss ONE day, your entire progress (Streak & Level) will be WIPED.\n\nAre you sure you have what it takes?");
       if (confirm) {
         setHardcoreMode(true);
-        soundManager.playThud();
+        play('thud');
         triggerHaptic('heavy');
       }
     } else {
       setHardcoreMode(false);
-      soundManager.playThud();
+      play('thud');
     }
   };
 
   const handleProtocolSelect = (newHabits) => {
     setHabitsBulk(newHabits);
-    soundManager.playCharge();
+    play('charge');
     triggerHaptic('heavy');
     confetti({
       particleCount: 150,
@@ -120,7 +94,7 @@ function App() {
     if (isCompleted) {
       // STRICT MODE: Cannot undo a completed habit for the day
       triggerHaptic('medium');
-      soundManager.playGlitch();
+      play('glitch');
       return;
     }
 
@@ -130,7 +104,7 @@ function App() {
     // 3. Effects (if successfully completed)
     if (nowCompleted) {
       triggerHaptic('success');
-      soundManager.playThud();
+      play('thud');
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 300);
 
@@ -141,22 +115,15 @@ function App() {
       }
 
       // Perfect Day Check
-      const currentCount = (history[today] || []).length; // Count BEFORE this toggle (from current render state)
-      // Since we just added one, total is currentCount + 1
-
+      const currentCount = (history[today] || []).length;
       if (habits.length > 0 && (currentCount + 1) === habits.length) {
-        // Check if we should trigger mystery box (simplified logic for now)
-        // Original logic checked lastMysteryBoxDate in history state.
-        // We don't have that in the new history object (it's just logs).
-        // We can just trigger confetti every time for now.
-
         confetti({
           particleCount: 100,
           spread: 70,
           origin: { y: 0.6 },
           colors: ['#39FF14', '#ffffff']
         });
-        soundManager.playCharge();
+        play('charge');
 
         // Optional: Show Knowledge Card occasionally
         if (Math.random() > 0.7) {
@@ -168,7 +135,7 @@ function App() {
 
   const handleShare = async () => {
     if (proofRef.current) {
-      soundManager.playCharge();
+      play('charge');
       await new Promise(resolve => setTimeout(resolve, 100));
 
       const canvas = await html2canvas(proofRef.current, {
