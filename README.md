@@ -94,3 +94,26 @@ npm run build
 
 **OPTIMAL PROTOCOL // SYSTEM ONLINE**
 *Initialize Your Twin. Achieve God Mode.*
+
+---
+
+## ☁️ BACKEND & AUTH (SUPABASE)
+
+The application uses **Supabase** for data persistence and authentication.
+
+### Setup
+1. Create a Supabase project.
+2. Run the SQL script in `supabase/schema.sql` in your Supabase SQL Editor to set up tables and policies.
+3. Configure Authentication (Email/Magic Link, Google, Apple).
+4. Set environment variables in `.env` (see `.env.example`).
+
+### 📱 MOBILE LOGIN TROUBLESHOOTING (LOCALHOST)
+
+If you are testing on a mobile device via local network (PWA/Safari):
+
+1. **Network Access:** Ensure you run `npm run dev -- --host`.
+2. **Redirect URL:** Add your computer's Network IP (e.g., `http://192.168.0.x:5174`) to Supabase **Redirect URLs**.
+3. **Manual Entry (Fallback):**
+   - If the Magic Link fails to open the app on mobile (common with localhost/http), copy the link from the email.
+   - Paste it into the **"Paste link here"** field on the login screen.
+   - Click the link icon to log in manually.
