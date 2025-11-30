@@ -63,6 +63,13 @@ const IdentityInitialization = () => {
                 <div>
                     <h1 className="auth-title">Identity Initialization</h1>
                     <p className="auth-subtitle">Establish connection to the Optimal Protocol network.</p>
+                    {window.location.hostname === 'localhost' && (
+                        <p style={{ fontSize: '0.7rem', color: '#ff4444', marginTop: '0.5rem', background: 'rgba(255,0,0,0.1)', padding: '0.5rem', borderRadius: '8px' }}>
+                            ⚠️ <b>LOCALHOST DETECTED</b><br />
+                            Links sent from here will NOT work on mobile.<br />
+                            Use your Local IP or Deploy the app.
+                        </p>
+                    )}
                 </div>
 
                 <div className="social-buttons">
