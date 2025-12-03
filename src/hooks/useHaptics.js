@@ -10,21 +10,79 @@ export const useHaptics = () => {
         }
     }, []);
 
-    const success = useCallback(async () => {
+    const heavyImpact = useCallback(async () => {
         try {
-            await Haptics.notification({ type: NotificationType.Success });
+            await Haptics.impact({ style: ImpactStyle.Heavy });
         } catch (error) {
-            console.error('Haptics success failed:', error);
+            console.error('Haptics heavy impact failed:', error);
         }
     }, []);
 
-    const error = useCallback(async () => {
+    const lightImpact = useCallback(async () => {
         try {
-            await Haptics.notification({ type: NotificationType.Error });
-        } catch (err) {
-            console.error('Haptics error failed:', err);
+            await Haptics.impact({ style: ImpactStyle.Light });
+        } catch (error) {
+            console.error('Haptics light impact failed:', error);
         }
     }, []);
 
-    return { impact, success, error };
+    const mediumImpact = useCallback(async () => {
+        try {
+            await Haptics.impact({ style: ImpactStyle.Medium });
+        } catch (error) {
+            console.error('Haptics medium impact failed:', error);
+        }
+    }, []);
+
+    const notification = useCallback(async (type = NotificationType.Success) => {
+        try {
+            await Haptics.notification({ type });
+        } catch (error) {
+            console.error('Haptics notification failed:', error);
+        }
+    }, []);
+
+    const vibrate = useCallback(async (duration = 300) => {
+        try {
+            await Haptics.vibrate({ duration });
+        } catch (error) {
+            console.error('Haptics vibrate failed:', error);
+        }
+    }, []);
+
+    const selectionStart = useCallback(async () => {
+        try {
+            await Haptics.selectionStart();
+        } catch (error) {
+            console.error('Haptics selectionStart failed:', error);
+        }
+    }, []);
+
+    const selectionChanged = useCallback(async () => {
+        try {
+            await Haptics.selectionChanged();
+        } catch (error) {
+            console.error('Haptics selectionChanged failed:', error);
+        }
+    }, []);
+
+    const selectionEnd = useCallback(async () => {
+        try {
+            await Haptics.selectionEnd();
+        } catch (error) {
+            console.error('Haptics selectionEnd failed:', error);
+        }
+    }, []);
+
+    return {
+        impact,
+        heavyImpact,
+        lightImpact,
+        mediumImpact,
+        notification,
+        vibrate,
+        selectionStart,
+        selectionChanged,
+        selectionEnd,
+    };
 };

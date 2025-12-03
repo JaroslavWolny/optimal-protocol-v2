@@ -10,73 +10,45 @@ You are the Operator. The **Cyber-Construct** is your digital soul. Feed it with
 
 ---
 
-## 🚀 THE GOD STACK (iOS NATIVE)
+## 🚀 THE HYBRID GOD STACK (v5.0)
 
-We have migrated to a pure, bleeding-edge Apple ecosystem stack to achieve **GODLIKE** performance.
+We have evolved beyond pure native constraints. We now run a **Hybrid Core** to dominate all platforms.
 
--   **CORE:** **Swift 6.0** (The language of the gods)
--   **UI:** **SwiftUI** with Glassmorphism & ZStack layering.
--   **ENGINE:** **SceneKit** (Replacing React Three Fiber for raw native 3D performance).
--   **VISUALS:** **Metal Shaders (MSL)**. Custom GPU pipelines for "Scanlines", "Glitch", and "Pixelation" effects. No CSS filters allowed.
--   **HAPTICS:** **Core Haptics**. Complex vibration textures. Feel the weight of your success.
--   **WIDGETS:** **WidgetKit**. Persistent Home Screen surveillance. The protocol is always watching.
--   **DATA:** **Supabase (Swift)**. Real-time synchronization.
-
----
-
-## 💀 HARDCORE MODE (PERMADEATH)
-
-**⚠️ WARNING: EXTREME DISCIPLINE REQUIRED.**
-
--   **The Contract:** If you miss **ONE DAY**, your entire existence (Streak, Level, Avatar) is **TERMINATED**.
--   **System Failure:** The interface bleeds red. Alarms sound. Your avatar decays instantly.
--   **No Mercy:** There is no undo button.
-
----
-
-## 👁️ OMNIPRESENCE LAYER (WIDGETS)
-
-The protocol does not sleep.
-
--   **Tactical HUD (Small/Medium):** Displays your current Streak and Integrity on the Home Screen.
--   **Bio-Link:** Updates instantly via App Groups when you log a habit.
--   **Drill Sergeant:** Local notifications at 07:00 and 20:00 to ensure compliance.
-
----
-
-## 🤖 THE DOOM AVATAR (NATIVE)
-
-Your digital twin is now a **Procedural SceneKit Entity**.
-
--   **Dynamic Morphology:** Muscles grow with 'Strength' habits. Armor plates thicken with 'Resilience'.
--   **Retro-Rendering:** The 3D scene is passed through a custom **Metal Pixelation Shader** to mimic the raw, jagged aesthetic of 1995 FPS games.
--   **12 FPS Animation:** We artificially limit the animation frame rate to capture that crunchy stop-motion feel, while the camera glides at a buttery 120Hz.
+-   **CORE:** **React + Vite**. The speed of the web, the power of the browser.
+-   **NATIVE BRIDGE:** **Capacitor.js**. Direct access to iOS internals (Haptics, Filesystem, Notifications) from JavaScript.
+-   **3D ENGINE:** **React Three Fiber (WebGL)**. Universal 3D rendering replacing SceneKit. Runs everywhere.
+-   **VISUALS:** **Postprocessing**. Custom shaders for "Scanlines", "Glitch", and "Pixelation" effects.
+-   **DATA:** **Supabase**. Real-time synchronization.
 
 ---
 
 ## 📂 PROJECT STRUCTURE
 
 ```text
-/OptimalProtocol
-  ├── OptimalProtocol/
-  │   ├── Models/        # Swift Structs (User, Habit, Log)
-  │   ├── Views/         # SwiftUI & SceneKit Views
-  │   ├── Resources/     # Metal Shaders & Assets
-  │   ├── Managers/      # Game Logic & State
-  │   └── OptimalProtocolApp.swift
-  ├── OptimalWidgets/    # WidgetKit Extensions
-  └── OptimalProtocol.xcodeproj
+/
+  ├── src/
+  │   ├── components/    # React Components (UI & 3D)
+  │   ├── hooks/         # Custom Hooks (useHaptics, etc.)
+  │   ├── services/      # Capacitor Services
+  │   └── ...
+  ├── ios/               # Native iOS Project (Capacitor generated)
+  ├── dist/              # Production Build
+  └── capacitor.config.json
 ```
 
 ---
 
 ## 🛠️ DEPLOYMENT INSTRUCTIONS
 
-### 📱 iOS NATIVE (THE NEW STANDARD)
-1.  Open `OptimalProtocol/OptimalProtocol.xcodeproj` in **Xcode 16+**.
-2.  Add Package Dependency: `supabase-swift`.
-3.  Target Device: **iPhone 15 Pro / 16 Pro** (Required for Metal Performance).
-4.  **Build & Run (Cmd+R)**.
+### 📱 iOS HYBRID
+1.  **Build Web Core:** `npm run build`
+2.  **Sync Native:** `npx cap sync`
+3.  **Open Xcode:** `npx cap open ios`
+4.  **Run:** Select your device and hit Play.
+
+### 🌐 WEB DEVELOPMENT
+1.  `npm run dev` - Starts the local Vite server.
+
 
 ### ☁️ SERVER MIGRATION (REQUIRED)
 To enable server-side streak tracking and Hardcore Mode enforcement:
@@ -86,6 +58,11 @@ To enable server-side streak tracking and Hardcore Mode enforcement:
     -   Create the `calculate_streak` function.
     -   Enable the "Reaper" trigger for Hardcore Mode.
     -   Lock down the `profiles` table so users cannot cheat.
+
+4.  **Deploy Edge Functions:**
+    -   Ensure you have the Supabase CLI installed and logged in.
+    -   Run: `supabase functions deploy monitor-vital-signs --no-verify-jwt`
+    -   This function handles the "Permadeath" logic (resetting stats on failure) securely on the server.
 
 ### 🚀 WEB DEPLOYMENT (VERCEL)
 1.  Install Vercel CLI: `npm i -g vercel`

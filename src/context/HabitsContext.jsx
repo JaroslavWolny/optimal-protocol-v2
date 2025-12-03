@@ -2,6 +2,10 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { supabase } from '../lib/supabase';
 import { useToast } from './ToastContext';
 
+
+import { useHaptics } from '../hooks/useHaptics';
+import { NotificationType } from '@capacitor/haptics';
+
 const HabitsContext = createContext();
 
 export const useHabits = () => {
@@ -19,18 +23,30 @@ export const HabitsProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const toast = useToast();
 
+    const { lightImpact, mediumImpact, heavyImpact, notification } = useHaptics();
+
     // Haptic feedback helper
-    const triggerHaptic = (type = 'light') => {
-        if (navigator.vibrate) {
-            const patterns = {
-                light: 10,
-                medium: 20,
-                heavy: 40,
-                success: [10, 30, 10]
-            };
-            navigator.vibrate(patterns[type] || 10);
+    const triggerHaptic = useCallback((type = 'light') => {
+        switch (type) {
+            case 'light':
+                lightImpact();
+                break;
+            case 'medium':
+                mediumImpact();
+                break;
+            case 'heavy':
+                heavyImpact();
+                break;
+            case 'success':
+                notification(NotificationType.Success);
+                break;
+            case 'error':
+                notification(NotificationType.Error);
+                break;
+            default:
+                lightImpact();
         }
-    };
+    }, [lightImpact, mediumImpact, heavyImpact, notification]);
 
     const syncLocalToCloud = async (userId, localHabits, localHistory) => {
         // 1. Insert Habits

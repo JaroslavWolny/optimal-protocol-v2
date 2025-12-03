@@ -59,20 +59,10 @@ export function useGamification() {
 
     const streak = calculateStreak();
 
-    // Permadeath Check
-    useEffect(() => {
-        if (hardcoreMode) {
-            const hasHistory = Object.keys(history).length > 0;
-            if (streak === 0 && hasHistory) {
-                const dates = Object.keys(history).sort();
-                const lastDateStr = dates[dates.length - 1];
+    // Permadeath Check - DEPRECATED
+    // Logic moved to Server-Side Edge Function (monitor-vital-signs)
+    // The client now only reflects the state (streak 0) if the server killed the user.
 
-                if (lastDateStr && lastDateStr !== today) {
-                    // Logic handled in App.jsx or Context usually, but here we just calculate
-                }
-            }
-        }
-    }, [streak, hardcoreMode, history, today]);
 
     const calculateHabitStreak = (habitId) => {
         let streak = 0;

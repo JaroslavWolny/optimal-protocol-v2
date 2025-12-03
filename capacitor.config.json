@@ -1,5 +1,5 @@
 {
   "appId": "com.optimal.protocol",
   "appName": "OptimalProtocol",
-  "webDir": "www"
+  "webDir": "dist"
 }
