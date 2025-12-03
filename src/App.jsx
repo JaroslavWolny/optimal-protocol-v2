@@ -17,6 +17,8 @@ import { useHabits } from './hooks/useHabits';
 import { useGamification } from './hooks/useGamification';
 import { useAudio } from './context/AudioContext';
 
+const DeathCertificate = React.lazy(() => import('./components/DeathCertificate'));
+
 function App() {
   const {
     habits,
@@ -134,21 +136,21 @@ function App() {
   };
 
   const handleShare = async () => {
-    if (proofRef.current) {
+    // Use the new Share Card (shareRef) if available, otherwise fallback to ProofHUD
+    const elementToShare = shareRef.current || proofRef.current;
+
+    if (elementToShare) {
       play('charge');
-      await new Promise(resolve => setTimeout(resolve, 100));
+      triggerHaptic('medium');
 
-      const canvas = await html2canvas(proofRef.current, {
-        backgroundColor: null,
-        scale: 2,
-        useCORS: true
-      });
-
-      const image = canvas.toDataURL("image/png");
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = `optimal-overlay-${today}.png`;
-      link.click();
+      // Use the new One-Tap Share utility
+      const { shareElement } = await import('./utils/shareUtils');
+      await shareElement(
+        elementToShare,
+        `optimal-status-${today}.png`,
+        'MY PROTOCOL STATUS',
+        `Day ${streak} of the Optimal Protocol. Can you keep up?`
+      );
 
       triggerHaptic('success');
     }
@@ -217,6 +219,15 @@ function App() {
 
   if (!user) {
     return <IdentityInitialization />;
+  }
+
+  // --- DEATH CHECK ---
+  if (user.status === 'DEAD') {
+    return (
+      <React.Suspense fallback={<div className="glitch-text">LOADING DEATH...</div>}>
+        <DeathCertificate user={user} />
+      </React.Suspense>
+    );
   }
 
   return (

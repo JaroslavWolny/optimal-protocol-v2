@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useHabits } from './useHabits';
 
 export function useGamification() {
@@ -21,7 +21,7 @@ export function useGamification() {
     const today = getTodayStr();
 
     const calculateStreak = () => {
-        let streak = 0;
+        let currentStreak = 0;
         const todayDate = new Date();
 
         for (let i = 0; i < 365; i++) {
@@ -47,17 +47,18 @@ export function useGamification() {
             const allCompleted = relevantHabits.every(h => completedIds.includes(h.id));
 
             if (allCompleted) {
-                streak++;
+                currentStreak++;
             } else if (i === 0) {
                 continue;
             } else {
                 break;
             }
         }
-        return streak;
+        return currentStreak;
     };
 
-    const streak = calculateStreak();
+    // OPTIMIZATION: Memoize streak calculation to prevent heavy logic on every render
+    const streak = useMemo(() => calculateStreak(), [history, habits]);
 
     // Permadeath Check - DEPRECATED
     // Logic moved to Server-Side Edge Function (monitor-vital-signs)

@@ -1,0 +1,124 @@
+/* DeathCertificate.css */
+.death-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000000;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: 'Times New Roman', serif;
+    /* Classic "Death" font */
+    padding: 20px;
+}
+
+.death-certificate {
+    background: #111;
+    border: 2px solid #333;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 0 50px rgba(255, 0, 0, 0.1);
+}
+
+.death-certificate::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    border: 1px solid #222;
+    pointer-events: none;
+}
+
+.death-header {
+    font-size: 2rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    color: #888;
+    text-transform: uppercase;
+}
+
+.death-title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #ff003c;
+    /* Blood Red */
+    margin-bottom: 30px;
+    text-shadow: 0 0 10px rgba(255, 0, 60, 0.5);
+    font-family: 'Courier New', monospace;
+    /* Or a gothic font if available */
+}
+
+.death-details {
+    margin-bottom: 40px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #ccc;
+}
+
+.death-label {
+    font-size: 0.8rem;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 15px;
+}
+
+.death-value {
+    font-size: 1.5rem;
+    color: #fff;
+    font-weight: bold;
+}
+
+.death-cause {
+    color: #ff003c;
+    font-style: italic;
+}
+
+.death-actions {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.btn-respawn {
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+}
+
+.btn-respawn:hover {
+    background: #ccc;
+    transform: scale(1.02);
+}
+
+.btn-respawn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.death-info {
+    font-size: 0.8rem;
+    color: #444;
+    margin-top: 10px;
+}

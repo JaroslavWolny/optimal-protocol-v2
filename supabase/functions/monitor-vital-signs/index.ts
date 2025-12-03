@@ -70,15 +70,14 @@ export default async (req: Request) => {
             throw deleteLogsError
         }
 
-        // B. Reset Profile Stats
+        // B. Mark as DEAD (Do NOT reset stats yet - we need them for the Death Certificate)
         const { error: updateProfileError } = await supabase
             .from('profiles')
             .update({
-                streak: 0,
-                avatar_stage: 0,
-                last_active: new Date().toISOString() // Mark as touched so we don't kill them again immediately? 
-                // Actually, last_log_date remains old, so they might get killed again tomorrow 
-                // if they don't log. But streak is 0, so they are ignored by .gt('streak', 0).
+                status: 'DEAD',
+                // streak: 0, // Don't reset yet! Let them see what they lost.
+                // avatar_stage: 0,
+                last_active: new Date().toISOString()
             })
             .in('id', deadUserIds)
 

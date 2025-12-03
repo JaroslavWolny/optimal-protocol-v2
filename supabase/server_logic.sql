@@ -90,7 +90,7 @@ CREATE TRIGGER trigger_log_change
 AFTER INSERT OR DELETE ON public.logs
 FOR EACH ROW EXECUTE PROCEDURE on_log_change();
 
--- 5. THE REAPER (HARDCORE CHECK)
+-- 5. THE REAPER (HARDCORE CHECK - CLIENT SIDE FALLBACK)
 -- Call this function from the client on App Init: supabase.rpc('check_vital_signs')
 CREATE OR REPLACE FUNCTION check_vital_signs()
 RETURNS JSONB AS $$
@@ -131,5 +131,26 @@ BEGIN
         'streak', v_profile.streak,
         'hardcore', v_profile.hardcore_mode
     );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 6. THE REAPER (BATCH JOB - CRON EXECUTION)
+-- Run this via Cron Edge Function every night to kill inactive hardcore users
+CREATE OR REPLACE FUNCTION reap_souls()
+RETURNS INT AS $$
+DECLARE
+    v_killed_count INT;
+BEGIN
+    WITH killed_users AS (
+        UPDATE public.profiles
+        SET streak = 0, 
+            avatar_stage = 0
+        WHERE hardcore_mode = TRUE 
+          AND (CURRENT_DATE - COALESCE(last_log_date, CURRENT_DATE)) > 1
+        RETURNING id
+    )
+    SELECT count(*) INTO v_killed_count FROM killed_users;
+
+    RETURN v_killed_count;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

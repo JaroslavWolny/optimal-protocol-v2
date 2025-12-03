@@ -111,14 +111,24 @@ const RetroLimb = ({ position, args, color, scale = [1, 1, 1], glow = false, edg
     const mesh = useRef();
     const material = useRef();
 
+    // OPTIMIZATION: Create base color once, do not re-allocate in loop or render
+    const baseColorObj = useMemo(() => new THREE.Color(color), [color]);
+    const tempColor = useMemo(() => new THREE.Color(), []); // For mutations
+
     useFrame((state) => {
         if (material.current) {
             material.current.time = state.clock.elapsedTime;
             material.current.glitchStrength = glitchIntensity;
 
-            // Pulse effect for glow
+            // PERFORMANCE FIX: Mutate existing color object instead of creating new one
             if (glow) {
-                material.current.baseColor = new THREE.Color(color).multiplyScalar(1.0 + Math.sin(state.clock.elapsedTime * 5.0) * 0.5);
+                const pulse = 1.0 + Math.sin(state.clock.elapsedTime * 5.0) * 0.5;
+                // Copy base to temp, apply pulse, assign to material
+                tempColor.copy(baseColorObj).multiplyScalar(pulse);
+                material.current.baseColor = tempColor;
+            } else {
+                // Reset to base color if not glowing (or if glow stopped)
+                material.current.baseColor = baseColorObj;
             }
         }
     });
@@ -128,7 +138,7 @@ const RetroLimb = ({ position, args, color, scale = [1, 1, 1], glow = false, edg
             {/* Use our Custom Shader Material */}
             <retroHologramMaterial
                 ref={material}
-                baseColor={new THREE.Color(color)}
+                baseColor={baseColorObj} // Pass the memoized object
                 scanlineDensity={20.0}
                 glitchStrength={glitchIntensity}
                 noiseStrength={0.05}
