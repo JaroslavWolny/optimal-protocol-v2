@@ -11,10 +11,19 @@ const IdentityInitialization = () => {
     const [sent, setSent] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null);
 
-    // Auto-detect redirect URL
+    // Auto-detect redirect URL with override support
     const getRedirectUrl = () => {
+        // 1. Check for explicit environment variable override (Crucial for Mobile/Capacitor)
+        if (import.meta.env.VITE_REDIRECT_URL) return import.meta.env.VITE_REDIRECT_URL;
+        if (import.meta.env.VITE_SITE_URL) return import.meta.env.VITE_SITE_URL;
+
+        // 2. Default to current origin
         return window.location.origin;
     };
+
+    useEffect(() => {
+        console.log("IdentityInitialization: Using Redirect URL ->", getRedirectUrl());
+    }, []);
 
     const handleSocialLogin = async (provider) => {
         setErrorMsg(null);

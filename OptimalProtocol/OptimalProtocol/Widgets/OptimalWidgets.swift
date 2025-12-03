@@ -1,20 +1,6 @@
 import SwiftUI
 import WidgetKit
 
-// --- SHARED DATA MODEL (Mock for Preview) ---
-struct WidgetData: Codable {
-    let streak: Int
-    let integrity: Float
-    let habits: [SimpleHabit]
-    let lastUpdate: Date
-}
-
-struct SimpleHabit: Codable, Identifiable {
-    let id: UUID
-    let title: String
-    let isCompleted: Bool
-}
-
 // --- VIEWS ---
 
 struct OptimalWidgetEntryView : View {
@@ -165,6 +151,9 @@ struct MediumWidgetView: View {
 // --- TIMELINE PROVIDER ---
 
 struct Provider: TimelineProvider {
+    // TOTO BYLA TA CHYBA - Explicitně říkáme, co je "Entry"
+    typealias Entry = SimpleEntry
+
     func placeholder(in context: Context) -> SimpleEntry {
         SimpleEntry(date: Date(), data: WidgetData(streak: 0, integrity: 1.0, habits: [], lastUpdate: Date()))
     }
@@ -174,7 +163,7 @@ struct Provider: TimelineProvider {
         completion(entry)
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
+    func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> ()) {
         // Refresh every 15 minutes
         let currentDate = Date()
         let refreshDate = Calendar.current.date(byAdding: .minute, value: 15, to: currentDate)!

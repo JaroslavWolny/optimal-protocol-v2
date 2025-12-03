@@ -57,11 +57,14 @@ Your digital twin is now a **Procedural SceneKit Entity**.
 ## 📂 PROJECT STRUCTURE
 
 ```text
-/ios-app
-  ├── Models/        # Swift Structs (User, Habit, Log)
-  ├── Views/         # SwiftUI & SceneKit Views
-  ├── Resources/     # Metal Shaders & Assets
-  ├── Managers/      # Game Logic & State
+/OptimalProtocol
+  ├── OptimalProtocol/
+  │   ├── Models/        # Swift Structs (User, Habit, Log)
+  │   ├── Views/         # SwiftUI & SceneKit Views
+  │   ├── Resources/     # Metal Shaders & Assets
+  │   ├── Managers/      # Game Logic & State
+  │   └── OptimalProtocolApp.swift
+  ├── OptimalWidgets/    # WidgetKit Extensions
   └── OptimalProtocol.xcodeproj
 ```
 
@@ -70,7 +73,7 @@ Your digital twin is now a **Procedural SceneKit Entity**.
 ## 🛠️ DEPLOYMENT INSTRUCTIONS
 
 ### 📱 iOS NATIVE (THE NEW STANDARD)
-1.  Open `ios-app/OptimalProtocol.xcodeproj` in **Xcode 16+**.
+1.  Open `OptimalProtocol/OptimalProtocol.xcodeproj` in **Xcode 16+**.
 2.  Add Package Dependency: `supabase-swift`.
 3.  Target Device: **iPhone 15 Pro / 16 Pro** (Required for Metal Performance).
 4.  **Build & Run (Cmd+R)**.
