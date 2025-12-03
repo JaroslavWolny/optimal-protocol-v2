@@ -1,78 +1,97 @@
-# ⚡ OPTIMAL PROTOCOL // NATIVE (v4.0)
+# ⚡ OPTIMAL PROTOCOL // V5.0: THE HYBRID WEAPON
 
-**THE ULTIMATE DISCIPLINE MACHINE.**
+> **"WEAKNESS IS A CHOICE. THIS SOFTWARE REMOVES THAT OPTION."**
 
-> "Weakness is a choice. This software removes that option."
-
-**OPTIMAL PROTOCOL** has evolved. We have abandoned the constraints of the web browser. This is no longer a JavaScript toy. This is a **NATIVE iOS WEAPON** built for maximum performance, zero latency, and aggressive psychological re-wiring.
-
-You are the Operator. The **Cyber-Construct** is your digital soul. Feed it with discipline, or watch it rot in high-definition 120Hz.
+![System Status](https://img.shields.io/badge/SYSTEM-ONLINE-brightgreen?style=for-the-badge&logo=apple) ![Protocol](https://img.shields.io/badge/PROTOCOL-HARDCORE-red?style=for-the-badge) ![Stack](https://img.shields.io/badge/CORE-HYBRID-blue?style=for-the-badge)
 
 ---
 
-## 🚀 THE HYBRID GOD STACK (v5.0)
+## 💀 WHAT IS THIS?
 
-We have evolved beyond pure native constraints. We now run a **Hybrid Core** to dominate all platforms.
+**OPTIMAL PROTOCOL** is not a "habit tracker". It is a **Digital Drill Sergeant**. It is a **Psychological Framework** encoded into silicon.
 
--   **CORE:** **React + Vite**. The speed of the web, the power of the browser.
--   **NATIVE BRIDGE:** **Capacitor.js**. Direct access to iOS internals (Haptics, Filesystem, Notifications) from JavaScript.
--   **3D ENGINE:** **React Three Fiber (WebGL)**. Universal 3D rendering replacing SceneKit. Runs everywhere.
--   **VISUALS:** **Postprocessing**. Custom shaders for "Scanlines", "Glitch", and "Pixelation" effects.
--   **DATA:** **Supabase**. Real-time synchronization.
+We have abandoned the limitations of standard apps. We have forged a **Hybrid God Stack** that combines the raw speed of the web with the visceral power of native hardware.
+
+**Your Mission:** Feed the **Cyber-Construct**. It is your digital soul.
+-   **Train.** It grows.
+-   **Slack off.** It rots.
+-   **Fail.** It dies. (Permadeath is real).
 
 ---
 
-## 📂 PROJECT STRUCTURE
+## 🚀 THE ARMORY (TECH STACK)
+
+We don't use "frameworks". We use **Weapons of Mass Construction**.
+
+### 🧠 THE BRAIN: React + Vite
+The neural network. Instant state updates. Zero latency. The speed of thought.
+
+### 🌉 THE BRIDGE: Capacitor.js (Native Core)
+We have breached the walled garden.
+-   **Haptics:** Feel every rep. The phone physically recoils when you complete a task.
+-   **Filesystem:** Local encrypted storage for offline survival.
+-   **Notifications:** The system screams at you if you forget your duty.
+
+### 👁️ THE VISUAL CORTEX: React Three Fiber (WebGL)
+-   **Procedural Avatar:** A 3D representation of your physical state.
+-   **Custom Shaders:** "Retro-Glitch", "Scanlines", and "Hologram" effects written in raw GLSL.
+-   **60 FPS:** Smoothness is mandatory.
+
+### ☁️ THE OVERMIND: Supabase (Edge Functions)
+-   **The Reaper:** A server-side Edge Function that monitors your vital signs 24/7.
+-   **Anti-Cheat:** Row Level Security (RLS) ensures you cannot fake your progress.
+-   **Real-time Sync:** Your discipline is backed up to the cloud instantly.
+
+---
+
+## 🛠️ INITIATION SEQUENCE (DEPLOYMENT)
+
+### 📱 PHASE 1: iOS HYBRID DEPLOYMENT
+1.  **Compile Core:** `npm run build`
+2.  **Inject Native Code:** `npx cap sync`
+3.  **Breach Xcode:** `npx cap open ios`
+4.  **Execute:** Select your device and hit **PLAY**.
+
+### 🌐 PHASE 2: WEB DEPLOYMENT (VERCEL)
+1.  **Install CLI:** `npm i -g vercel`
+2.  **Deploy:** Run `vercel` in the root.
+3.  **Configure Env:**
+    -   `VITE_SUPABASE_URL`: [CLASSIFIED]
+    -   `VITE_SUPABASE_ANON_KEY`: [CLASSIFIED]
+
+### ☁️ PHASE 3: SERVER MIGRATION (CRITICAL)
+**WARNING:** Without this, the system is toothless.
+1.  Navigate to **Supabase Dashboard -> SQL Editor**.
+2.  Execute `supabase/server_logic.sql`.
+3.  **Deploy The Reaper:**
+    ```bash
+    supabase functions deploy monitor-vital-signs --no-verify-jwt
+    ```
+    *This activates the server-side kill switch.*
+
+---
+
+## 📂 BLUEPRINTS (STRUCTURE)
 
 ```text
 /
   ├── src/
-  │   ├── components/    # React Components (UI & 3D)
-  │   ├── hooks/         # Custom Hooks (useHaptics, etc.)
-  │   ├── services/      # Capacitor Services
+  │   ├── components/    # The Visual Interface
+  │   ├── hooks/         # The Logic Circuits (useGamification, useHaptics)
+  │   ├── services/      # Native Bridges
   │   └── ...
-  ├── ios/               # Native iOS Project (Capacitor generated)
-  ├── dist/              # Production Build
-  └── capacitor.config.json
+  ├── ios/               # The Native Shell
+  ├── supabase/          # The Backend Logic (SQL + Edge Functions)
+  └── dist/              # Compiled Weaponry
 ```
 
 ---
 
-## 🛠️ DEPLOYMENT INSTRUCTIONS
+## ⚠️ FINAL WARNING
 
-### 📱 iOS HYBRID
-1.  **Build Web Core:** `npm run build`
-2.  **Sync Native:** `npx cap sync`
-3.  **Open Xcode:** `npx cap open ios`
-4.  **Run:** Select your device and hit Play.
+This software tracks **Consistency**, not just activity.
+If you miss a day in **Hardcore Mode**, your avatar is deleted. Your streak is zeroed. Your shame is public.
 
-### 🌐 WEB DEVELOPMENT
-1.  `npm run dev` - Starts the local Vite server.
+**DISCIPLINE IS THE ONLY CURRENCY THAT MATTERS.**
 
-
-### ☁️ SERVER MIGRATION (REQUIRED)
-To enable server-side streak tracking and Hardcore Mode enforcement:
-1.  Go to your Supabase Dashboard -> SQL Editor.
-2.  Run the contents of `supabase/server_logic.sql`.
-3.  This will:
-    -   Create the `calculate_streak` function.
-    -   Enable the "Reaper" trigger for Hardcore Mode.
-    -   Lock down the `profiles` table so users cannot cheat.
-
-4.  **Deploy Edge Functions:**
-    -   Ensure you have the Supabase CLI installed and logged in.
-    -   Run: `supabase functions deploy monitor-vital-signs --no-verify-jwt`
-    -   This function handles the "Permadeath" logic (resetting stats on failure) securely on the server.
-
-### 🚀 WEB DEPLOYMENT (VERCEL)
-1.  Install Vercel CLI: `npm i -g vercel`
-2.  Run `vercel` in the project root.
-3.  Set Environment Variables in Vercel Dashboard:
-    -   `VITE_SUPABASE_URL`: [Your URL]
-    -   `VITE_SUPABASE_ANON_KEY`: [Your Key]
-4.  The `vercel.json` is pre-configured for SPA routing.
-
----
-
-**OPTIMAL PROTOCOL // SYSTEM ONLINE**
-*Discipline is the only currency that matters.*
+*System Online. Awaiting Input.*
