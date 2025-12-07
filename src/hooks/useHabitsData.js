@@ -130,7 +130,22 @@ export const useHabitsData = (toast) => {
     useEffect(() => {
         if (!supabase) {
             console.warn("Supabase not configured. Falling back to local state (ephemeral).");
-            toast.error("SYSTEM ERROR", "Supabase configuration missing.");
+
+            const isDemo = localStorage.getItem('demo_mode');
+            if (isDemo) {
+                setUser({ id: 'offline-user', email: 'operator@offline.local', status: 'ALIVE' });
+
+                // Load local data
+                try {
+                    const localHabits = JSON.parse(localStorage.getItem('habits_def') || '[]');
+                    const localHistory = JSON.parse(localStorage.getItem('habit_history') || '{}');
+                    setHabits(localHabits);
+                    setHistory(localHistory);
+                } catch (e) {
+                    console.error("Failed to load local data", e);
+                }
+            }
+
             setLoading(false);
             return;
         }
@@ -159,6 +174,14 @@ export const useHabitsData = (toast) => {
         return () => subscription.unsubscribe();
     }, [fetchData, toast]);
 
+    // Persistence Helper for Offline Mode
+    const persistLocal = (newHabits, newHistory) => {
+        if (!supabase) {
+            if (newHabits) localStorage.setItem('habits_def', JSON.stringify(newHabits));
+            if (newHistory) localStorage.setItem('habit_history', JSON.stringify(newHistory));
+        }
+    };
+
     // Actions
     const addHabit = useCallback(async (text, category = 'training') => {
         if (!user) return;
@@ -167,7 +190,13 @@ export const useHabitsData = (toast) => {
         const tempId = crypto.randomUUID();
         const newHabit = { id: tempId, user_id: user.id, title: text, category, frequency: 'daily' };
 
-        setHabits(prev => [...prev, newHabit]);
+        setHabits(prev => {
+            const next = [...prev, newHabit];
+            persistLocal(next, null);
+            return next;
+        });
+
+        if (!supabase) return true; // Offline success
 
         // Sync
         const { data, error } = await supabase.from('habits').insert({
@@ -190,7 +219,13 @@ export const useHabitsData = (toast) => {
     }, [user, toast]);
 
     const editHabit = useCallback(async (id, newText) => {
-        setHabits(prev => prev.map(h => h.id === id ? { ...h, title: newText } : h));
+        setHabits(prev => {
+            const next = prev.map(h => h.id === id ? { ...h, title: newText } : h);
+            persistLocal(next, null);
+            return next;
+        });
+
+        if (!supabase) return true;
 
         const { error } = await supabase.from('habits').update({ title: newText }).eq('id', id);
         if (error) {
@@ -202,7 +237,13 @@ export const useHabitsData = (toast) => {
     }, [toast]);
 
     const deleteHabit = useCallback(async (id) => {
-        setHabits(prev => prev.filter(h => h.id !== id));
+        setHabits(prev => {
+            const next = prev.filter(h => h.id !== id);
+            persistLocal(next, null);
+            return next;
+        });
+
+        if (!supabase) return true;
 
         const { error } = await supabase.from('habits').delete().eq('id', id);
         if (error) {
@@ -220,12 +261,17 @@ export const useHabitsData = (toast) => {
         // Optimistic Update
         setHistory(prev => {
             const dayLogs = prev[dateString] || [];
+            let nextHistory;
             if (isCompleted) {
-                return { ...prev, [dateString]: dayLogs.filter(id => id !== habitId) };
+                nextHistory = { ...prev, [dateString]: dayLogs.filter(id => id !== habitId) };
             } else {
-                return { ...prev, [dateString]: [...dayLogs, habitId] };
+                nextHistory = { ...prev, [dateString]: [...dayLogs, habitId] };
             }
+            persistLocal(null, nextHistory);
+            return nextHistory;
         });
+
+        if (!supabase) return !isCompleted;
 
         // Sync
         if (isCompleted) {
@@ -267,6 +313,16 @@ export const useHabitsData = (toast) => {
             category: h.category,
             frequency: 'daily'
         }));
+
+        if (!supabase) {
+            // Offline Bulk Set
+            // We need to give them IDs
+            const offlineHabits = habitsToInsert.map(h => ({ ...h, id: crypto.randomUUID() }));
+            setHabits(offlineHabits);
+            persistLocal(offlineHabits, null);
+            toast.success("OFFLINE PROTOCOL", "Directives stored locally.");
+            return true;
+        }
 
         const { data, error } = await supabase.from('habits').insert(habitsToInsert).select();
 

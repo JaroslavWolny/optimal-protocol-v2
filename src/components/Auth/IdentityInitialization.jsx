@@ -65,6 +65,55 @@ const IdentityInitialization = () => {
         }
     };
 
+    const handleDemoLogin = () => {
+        // Create a fake session for demo mode
+        // In a real app, we might want a context method to set a 'demoUser'
+        // But since App.jsx listens to onAuthStateChange, we might need to trick it or just reload if we were using local state.
+        // Actually, if supabase is null, App.jsx's listener won't fire.
+        // We need a way to tell App.jsx we are logged in.
+        // BUT, App.jsx uses useHabits() -> useHabitsData().
+        // useHabitsData handles the !supabase case by setting loading=false.
+        // But App.jsx checks `if (!user) return <IdentityInitialization />`.
+        // So we need to set a fake user in useHabitsData?
+        // Wait, useHabitsData is a hook used inside HabitsProvider.
+        // HabitsProvider provides `user`.
+        // If we are in demo mode, we need `user` to be non-null.
+        // Let's reload the page? No, that won't help.
+        // We need to trigger a state change in HabitsContext.
+        // Since we can't easily pass data up from here without a global store or prop...
+        // Let's use a custom event or local storage flag?
+
+        // BETTER APPROACH:
+        // If supabase is missing, IdentityInitialization should just show "ENTER OFFLINE MODE"
+        // and when clicked, we trigger a callback passed from App?
+        // Or we just set a localStorage flag 'demo_mode' and reload?
+        localStorage.setItem('demo_mode', 'true');
+        window.location.reload();
+    };
+
+    if (!supabase) {
+        return (
+            <div className="auth-container">
+                <div className="scan-line"></div>
+                <motion.div className="auth-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <div>
+                        <h1 className="auth-title">SYSTEM OFFLINE</h1>
+                        <p className="auth-subtitle">CONNECTION LOST</p>
+                    </div>
+
+                    <div className="auth-error" style={{ borderColor: '#FFD139', color: '#FFD139', background: 'rgba(255, 209, 57, 0.1)' }}>
+                        <AlertTriangle size={16} />
+                        Server connection unavailable.
+                    </div>
+
+                    <button className="magic-btn" onClick={handleDemoLogin}>
+                        INITIATE OFFLINE PROTOCOL
+                    </button>
+                </motion.div>
+            </div>
+        );
+    }
+
     const handleManualLogin = async () => {
         if (!manualLink) {
             setErrorMsg("Please paste the full link.");
