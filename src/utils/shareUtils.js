@@ -22,10 +22,10 @@ export const shareElement = async (element, fileName = 'share.png', title = 'Sha
             scale: 1,
             width: 1080,         // Force functionality on small screens
             height: 1920,        // Force functionality on small screens
-            windowWidth: 1080,   // Emulate desktop-class viewport
-            windowHeight: 1920,  // Emulate desktop-class viewport
             x: 0,
             y: 0,
+            scrollX: 0,
+            scrollY: 0,
             foreignObjectRendering: false // Disable if causing issues, standard canvas is safer
         });
 

@@ -165,10 +165,10 @@
     text-transform: uppercase;
     margin-top: -40px;
     text-shadow: 0 4px 10px black;
-    background: rgba(0, 0, 0, 0.8);
-    /* Darker backdrop */
+    background: rgba(0, 0, 0, 0.9);
+    /* Opaque for stability */
     padding: 5px 30px;
-    backdrop-filter: blur(10px);
+    /* backdrop-filter removed for html2canvas stability */
     z-index: 6;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -213,7 +213,8 @@
 }
 
 .stat-pill {
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(10, 10, 10, 0.85);
+    /* Solid dark for stability */
     border: 1px solid rgba(255, 255, 255, 0.15);
     width: 110px;
     height: 110px;
@@ -221,7 +222,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(10px);
+    /* backdrop-filter removed for html2canvas stability */
 }
 
 .sp-label {
