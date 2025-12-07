@@ -57,10 +57,9 @@ export const shareElement = async (element, fileName = 'share.png', title = 'Sha
             link.click();
         }
 
-        return true;
     } catch (error) {
         console.error('Error sharing element:', error);
-        alert('Debug HTML2Canvas Error: ' + error.message);
+        alert('Share Failed: ' + error.message);
         return false;
     }
 };
