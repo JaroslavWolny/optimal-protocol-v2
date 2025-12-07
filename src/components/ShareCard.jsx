@@ -60,7 +60,7 @@ const ShareCard = forwardRef(({ streak, habits, todayHabits, avatarImage }, ref)
             {/* 1. BACKGROUND / AVATAR LAYER */}
             <div className="poster-bg">
                 {avatarImage ? (
-                    <img src={avatarImage} className="poster-avatar-img" alt="Avatar" />
+                    <img src={avatarImage} className="poster-avatar-img" alt="Avatar" crossOrigin="anonymous" />
                 ) : (
                     <div className="poster-avatar-placeholder" />
                 )}
@@ -135,6 +135,7 @@ const ShareCard = forwardRef(({ streak, habits, todayHabits, avatarImage }, ref)
                         src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://optimalprotocol.app&color=000000&bgcolor=ffffff&margin=0"
                         className="ticket-qr"
                         alt="Join"
+                        crossOrigin="anonymous"
                     />
                 </div>
             </div>

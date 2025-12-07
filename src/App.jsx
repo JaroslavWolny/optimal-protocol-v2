@@ -137,33 +137,56 @@ function App() {
   };
 
   const handleShare = async () => {
-    play('charge');
-    triggerHaptic('medium');
+    try {
+      play('charge');
+      triggerHaptic('medium');
+      console.log('Initiating share sequence...');
 
-    // 1. Capture Avatar Snapshot if available
-    let snapshot = null;
-    if (bodyRef.current) {
-      snapshot = bodyRef.current.getSnapshot();
-      setAvatarSnapshot(snapshot);
-      // Wait for render to update ShareCard with the image
-      await new Promise(resolve => setTimeout(resolve, 150));
-    }
+      // 1. Capture Avatar Snapshot if available
+      let snapshot = null;
+      if (bodyRef.current) {
+        try {
+          snapshot = bodyRef.current.getSnapshot();
+          console.log('Avatar snapshot captured:', snapshot ? 'Success' : 'Failed');
+          if (snapshot) setAvatarSnapshot(snapshot);
+        } catch (e) {
+          console.error('Snapshot failed:', e);
+        }
+      }
 
-    // Use the new Share Card (shareRef) if available, otherwise fallback to ProofHUD
-    const elementToShare = shareRef.current || proofRef.current;
+      // Wait for React to render the new props into ShareCard
+      await new Promise(resolve => setTimeout(resolve, 200));
 
-    if (elementToShare) {
-      // Use the new One-Tap Share utility
-      const { shareElement } = await import('./utils/shareUtils');
-      await shareElement(
-        elementToShare,
-        `optimal-status-${today}.png`,
-        'PROTOCOL STATUS',
-        `Day ${streak} complete. Power Level: CHECKED. #OptimalProtocol`
-      );
+      // Use the new Share Card (shareRef) if available, otherwise fallback to ProofHUD
+      const elementToShare = shareRef.current || proofRef.current;
 
-      triggerHaptic('success');
-      setAvatarSnapshot(null); // Clear after sharing to save memory/state
+      if (elementToShare) {
+        console.log('Element found, generating canvas...');
+
+        // Use the new One-Tap Share utility
+        const { shareElement } = await import('./utils/shareUtils');
+        const success = await shareElement(
+          elementToShare,
+          `optimal-status-${today}.png`,
+          'PROTOCOL STATUS',
+          `Day ${streak} complete. Power Level: CHECKED. #OptimalProtocol`
+        );
+
+        if (success) {
+          triggerHaptic('success');
+          console.log('Share successful');
+        } else {
+          console.error('Share utility returned false');
+          alert('Share generation failed. Please try again.');
+        }
+
+        setAvatarSnapshot(null); // Clear after sharing
+      } else {
+        console.error('No element to share found (ref is null)');
+      }
+    } catch (error) {
+      console.error('Critical error in handleShare:', error);
+      alert('System Error: Could not generate status report.');
     }
   };
 
@@ -321,17 +344,22 @@ function App() {
         </button>
       </div>
 
+      {/* 
+          SHARE CARD CONTAINER 
+          Using 'top: 100vh' moves it off-screen without hiding it from the renderer.
+          Transparency is kept at 1 (fully visible to renderer).
+          z-index ensures it's behind everything.
+      */}
       <div style={{
         position: 'fixed',
-        top: 0,
+        top: '100vh',
         left: 0,
-        zIndex: -5,
-        opacity: 0,
-        pointerEvents: 'none',
-        // Ensure it has dimensions for capture
+        zIndex: -9999,
         width: '1080px',
         height: '1920px',
-        transform: 'scale(0.5)', // Optional: Scale down to not mess up layout flow if any
+        pointerEvents: 'none',
+        // Optional: Scale down to fit layout if necessary, but keep 1 for full res capture if possible
+        transform: 'scale(1)',
         transformOrigin: 'top left'
       }}>
         <ShareCard
