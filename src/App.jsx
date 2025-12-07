@@ -159,8 +159,8 @@ function App() {
       setIsGeneratingShare(true);
 
       // 3. Wait for Render & Image Load (Critical for html2canvas)
-      // Giving it 800ms to ensure full layout and asset loading
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Giving it 2000ms to ensure full layout and asset loading (fonts especially)
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // 4. Capture & Share
       const elementToShare = shareRef.current;
@@ -360,7 +360,7 @@ function App() {
           VISIBLE LOADING OVERLAY (Stealth Mode)
           - Blocks user interaction
           - Shows "Processing" state
-          - DOES NOT show the card (User requested hidden generation)
+          - COVERING the capture layer
       */}
       {isGeneratingShare && (
         <div style={{
@@ -369,7 +369,7 @@ function App() {
           left: 0,
           width: '100vw',
           height: '100vh',
-          zIndex: 99998,
+          zIndex: 2000, // Topmost layer
           background: '#000000',
           display: 'flex',
           flexDirection: 'column',
@@ -400,10 +400,10 @@ function App() {
       )}
 
       {/* 
-          HIDDEN CAPTURE LAYER (Actual Render Target)
+          CAPTURE LAYER (Behind Loading, Above App)
           - Rendered 1:1 Scale (1080x1920)
-          - Placed at top-left but behind everything (z-index -1)
-          - Opacity 1 (Critical for render) but covered by the black overlay above
+          - zIndex 1000 makes it "foreground" relative to app, ensuring paint
+          - But zIndex 2000 overlay covers it visually for user
       */}
       {isGeneratingShare && (
         <div style={{
@@ -412,7 +412,7 @@ function App() {
           left: 0,
           width: '1080px',
           height: '1920px',
-          zIndex: -1, // Behind the app, but technically "visible" in viewport flow
+          zIndex: 1000,
           background: '#000',
           pointerEvents: 'none'
         }}>
