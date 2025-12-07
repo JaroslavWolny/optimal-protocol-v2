@@ -1,30 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Teko:wght@300;400;500;600;700&family=Syncopate:wght@400;700&display=swap');
 
-/* --- POSTER STYLE CARD (V4) --- */
+/* --- POSTER STYLE CARD (Circuit Edition) --- */
 .share-card-poster {
     width: 1080px;
     height: 1920px;
-    background: #000;
+    background: #050505;
     position: relative;
     overflow: hidden;
     font-family: 'Teko', sans-serif;
-    /* Condensed, blocky font suitable for posters */
     color: white;
     display: flex;
     flex-direction: column;
 }
 
 /* --- BACKGROUND LAYERS --- */
+
+/* 1. Circuit Pattern */
 .poster-texture {
     position: absolute;
     inset: 0;
-    z-index: 2;
-    opacity: 0.12;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    z-index: 1;
+    opacity: 0.3;
     pointer-events: none;
-    mix-blend-mode: overlay;
+    /* Circuit SVG Pattern */
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 h 80 v 80 h -80 Z' fill='none' stroke='white' stroke-width='0.5' stroke-opacity='0.2'/%3E%3Cpath d='M50 0 v 100 M0 50 h 100' stroke='white' stroke-width='0.5' stroke-opacity='0.2'/%3E%3Ccircle cx='50' cy='50' r='2' fill='white' fill-opacity='0.2'/%3E%3Cpath d='M20 20 l 10 10 M80 20 l -10 10 M20 80 l 10 -10 M80 80 l -10 -10' stroke='white' stroke-width='0.5' stroke-opacity='0.2'/%3E%3C/svg%3E");
+    background-size: 100px 100px;
+    mask-image: radial-gradient(circle at 50% 50%, black 0%, transparent 80%);
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, black 0%, transparent 80%);
 }
 
+/* 2. Dynamic Glow Lines (The red traces) */
 .poster-bg {
     position: absolute;
     top: 0;
@@ -34,29 +39,47 @@
     z-index: 0;
 }
 
+.poster-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(45deg,
+            transparent,
+            transparent 40px,
+            var(--theme-color) 40px,
+            var(--theme-color) 41px);
+    opacity: 0.15;
+    mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
+}
+
 .poster-avatar-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* This creates the "cool" darkening/tinting effect without needing complex shaders */
-    filter: grayscale(100%) contrast(1.2) brightness(0.8);
-    transform: scale(1.05);
+    filter: grayscale(100%) contrast(1.1) brightness(0.7);
+    transform: scale(0.9);
+    /* Little smaller to see circuits */
 }
 
+/* Red Glow behind avatar */
 .poster-gradient-map {
     position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 50% 30%, transparent 20%, #000 120%),
-        linear-gradient(to bottom, transparent 40%, #000 100%),
-        linear-gradient(45deg, var(--theme-color) 0%, transparent 70%);
-    mix-blend-mode: hard-light;
-    opacity: 0.6;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 60%;
+    background: radial-gradient(circle, var(--theme-glow) 0%, transparent 70%);
+    opacity: 0.8;
+    mix-blend-mode: screen;
 }
 
 .poster-vignette {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.8) 100%);
+    background: radial-gradient(circle at 50% 40%, transparent 20%, #000 90%);
+    z-index: 2;
 }
 
 /* --- CONTENT --- */
@@ -67,7 +90,6 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
 }
 
 /* Header */
@@ -75,7 +97,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid white;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.8);
     padding-bottom: 30px;
 }
 
@@ -83,60 +105,71 @@
     font-family: 'Syncopate', sans-serif;
     font-weight: 700;
     font-size: 32px;
-    letter-spacing: -2px;
+    letter-spacing: -1px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
 }
 
 .poster-icon {
-    font-size: 32px;
     color: var(--theme-color);
+    filter: drop-shadow(0 0 10px var(--theme-color));
 }
 
 .poster-date {
-    font-size: 32px;
-    font-weight: 500;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 28px;
+    color: rgba(255, 255, 255, 0.7);
     letter-spacing: 2px;
-    opacity: 0.8;
 }
 
-/* BIG STAT - CENTER */
+/* CENTER HERO */
 .poster-hero-stat {
     position: absolute;
-    top: 45%;
+    top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -55%);
     text-align: center;
     width: 100%;
-    /* Creative Blend Mode */
-    mix-blend-mode: overlay;
-    /* Fallback if overlay is too subtle on dark bg, simpler: */
-    /* text-shadow: 0 0 50px var(--theme-glow); */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
+/* The Streak Number */
 .poster-big-num {
-    font-size: 600px;
-    line-height: 0.7;
+    font-size: 550px;
+    line-height: 0.75;
     font-weight: 700;
-    letter-spacing: -30px;
+    letter-spacing: -20px;
     color: white;
-    opacity: 0.9;
-    /* Optional Stroke effect preferred by user? Let's try solid for max impact first, or stroke */
-    /* -webkit-text-stroke: 4px white; color: transparent; */
+    /* Glow Effect */
+    text-shadow:
+        0 0 20px var(--theme-glow),
+        0 0 60px var(--theme-glow);
+    opacity: 0.95;
+    /* Simulate the 'cutout' look or solid depending on pref. 
+       Use mild transparency to let avatar show through slightly? */
+    mix-blend-mode: screen;
 }
 
 .poster-big-label {
     font-family: 'Syncopate', sans-serif;
-    font-size: 40px;
+    font-size: 42px;
     font-weight: 700;
-    letter-spacing: 20px;
-    margin-top: 20px;
+    letter-spacing: 15px;
     color: white;
     text-transform: uppercase;
+    margin-top: -40px;
+    /* Pull up into the number */
+    text-shadow: 0 4px 10px black;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0 20px;
+    backdrop-filter: blur(5px);
 }
 
-/* INFO GRID - BOTTOM OF CONTENT */
+/* INFO GRID */
 .poster-info-grid {
     margin-top: auto;
     margin-bottom: 40px;
@@ -146,134 +179,137 @@
 }
 
 .poster-rank-box {
-    border-left: 8px solid var(--theme-color);
-    padding-left: 30px;
+    border-left: 6px solid var(--theme-color);
+    padding-left: 24px;
+    display: flex;
+    flex-direction: column;
 }
 
 .poster-sub-label {
-    font-size: 32px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 24px;
     color: #888;
-    text-transform: uppercase;
-    font-weight: 400;
-    letter-spacing: 2px;
+    margin-bottom: 5px;
 }
 
 .poster-rank-val {
-    font-size: 110px;
-    line-height: 0.9;
+    font-size: 100px;
+    line-height: 0.85;
     font-weight: 600;
-    color: var(--theme-color);
-    text-shadow: 0 0 40px var(--theme-glow);
     text-transform: uppercase;
+    color: var(--theme-color);
+    text-shadow: 0 0 30px var(--theme-glow);
 }
 
 .poster-stats-row {
     display: flex;
-    gap: 20px;
+    gap: 16px;
 }
 
 .stat-pill {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 15px 30px;
-    border-radius: 0;
-    /* Boxy/Brutalist */
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    width: 110px;
+    height: 110px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     backdrop-filter: blur(10px);
 }
 
 .sp-label {
-    font-size: 24px;
-    color: #666;
-    letter-spacing: 2px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 20px;
+    color: #888;
+    margin-bottom: 5px;
 }
 
 .sp-val {
     font-size: 48px;
-    font-weight: 600;
+    font-weight: 700;
     line-height: 1;
-    color: white;
 }
 
 /* --- FOOTER (TICKET) --- */
 .poster-footer {
     background: white;
     color: black;
-    padding: 50px 60px;
+    padding: 60px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     position: relative;
     z-index: 4;
 }
 
-.poster-footer::before {
-    /* Perforation effect topside */
+/* Perforation line */
+.poster-footer::after {
     content: '';
     position: absolute;
-    top: -10px;
+    top: -2px;
     left: 0;
     width: 100%;
-    height: 20px;
-    background: radial-gradient(circle, #000 10px, transparent 11px);
-    background-size: 40px 40px;
-    background-position: x 0;
+    border-top: 4px dashed black;
+    opacity: 0.2;
 }
 
 .ticket-left {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .ticket-title {
-    font-size: 72px;
-    font-weight: 700;
+    font-size: 64px;
+    font-weight: 800;
     line-height: 0.9;
-    letter-spacing: -2px;
+    letter-spacing: -1px;
     text-transform: uppercase;
 }
 
 .ticket-sub {
     font-family: 'Syncopate', sans-serif;
-    font-size: 20px;
-    color: #555;
+    font-size: 18px;
     font-weight: 700;
-    margin-top: 10px;
+    color: #444;
     text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .ticket-power {
-    margin-top: 20px;
+    margin-top: 15px;
     font-size: 48px;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0;
 }
 
 .ticket-power span {
+    font-family: 'Share Tech Mono', monospace;
     font-size: 24px;
-    color: #888;
-    vertical-align: middle;
+    color: #666;
     margin-right: 10px;
 }
 
-.ticket-divider {
-    width: 2px;
-    height: 120px;
-    background: #000;
-    margin: 0 40px;
-    /* Dashed line */
-    background: repeating-linear-gradient(to bottom,
-            #000 0,
-            #000 10px,
-            transparent 10px,
-            transparent 20px);
+.ticket-right-group {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    text-align: right;
 }
 
-.ticket-right {
-    flex-shrink: 0;
+.ticket-cta-text {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .ticket-qr {
-    width: 160px;
-    height: 160px;
+    width: 140px;
+    height: 140px;
     display: block;
+    mix-blend-mode: multiply;
+    /* Ensure black blends with paper */
 }

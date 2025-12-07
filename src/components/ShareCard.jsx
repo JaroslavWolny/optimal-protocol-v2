@@ -120,15 +120,19 @@ const ShareCard = forwardRef(({ streak, habits, todayHabits, avatarImage }, ref)
             <div className="poster-footer">
                 <div className="ticket-left">
                     <div className="ticket-title">JOIN THE PROTOCOL</div>
-                    <div className="ticket-sub">Establish your neural link</div>
+                    <div className="ticket-sub">ESTABLISH YOUR NEURAL LINK</div>
                     <div className="ticket-power">
-                        <span>PWR</span> {powerLevel.toLocaleString()}
+                        <span>PWR</span> {powerLevel.toLocaleString().replace(/,/g, ' ')}
                     </div>
                 </div>
-                <div className="ticket-divider"></div>
-                <div className="ticket-right">
+
+                <div className="ticket-right-group">
+                    <div className="ticket-cta-text">
+                        <div>SWIPE UP TO JOIN</div>
+                        <div style={{ opacity: 0.5 }}>SCAN TO START</div>
+                    </div>
                     <img
-                        src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://optimalprotocol.app&color=000000&bgcolor=ffffff&margin=0"
+                        src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://optimalprotocol.app&color=000000&bgcolor=ffffff&margin=0"
                         className="ticket-qr"
                         alt="Join"
                     />
