@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { EffectComposer, Bloom, Glitch, Noise, Pixelation, Scanline, Vignette } from '@react-three/postprocessing';
 import { GlitchMode } from 'postprocessing';
