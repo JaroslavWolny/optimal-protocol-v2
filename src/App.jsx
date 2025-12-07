@@ -365,12 +365,12 @@ function App() {
       */}
       <div style={{
         position: 'fixed',
-        top: 0,
+        top: '200vh', // Far off-screen
         left: 0,
         width: '1080px',
         height: '1920px',
-        zIndex: -100,
-        opacity: 0.01,
+        zIndex: 9999, // High z-index to ensure it's "on top" of the void
+        opacity: 1, // Full opacity to force paint
         pointerEvents: 'none',
         background: '#000',
         overflow: 'hidden'
