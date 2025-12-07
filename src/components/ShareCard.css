@@ -310,6 +310,5 @@
     width: 140px;
     height: 140px;
     display: block;
-    mix-blend-mode: multiply;
-    /* Ensure black blends with paper */
+    /* mix-blend-mode removed for safer capture */
 }

@@ -15,10 +15,10 @@ export const shareElement = async (element, fileName = 'share.png', title = 'Sha
 
         // 1. Capture the element
         const canvas = await html2canvas(element, {
-            backgroundColor: null,
+            backgroundColor: '#000000', // Enforce black background
             useCORS: true, // Critical for external clean images
-            allowTaint: true, // Allow tainted images if CORS fails (fallback)
-            logging: false,
+            allowTaint: false, // MUST be false to allow toDataURL export
+            logging: true, // Enable logging to debug
             scale: 1, // Native resolution (card is already 1080p)
         });
 

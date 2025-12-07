@@ -351,6 +351,11 @@ function App() {
           Rendered on top of everything when generating.
           This ensures browser correctly paints the element for html2canvas.
       */}
+      {/* 
+          VISIBLE SHARE OVERLAY (User Feedback)
+          - Scaled down for viewing
+          - Visual feedback only
+      */}
       {isGeneratingShare && (
         <div style={{
           position: 'fixed',
@@ -358,16 +363,16 @@ function App() {
           left: 0,
           width: '100vw',
           height: '100vh',
-          zIndex: 99999,
+          zIndex: 99998, // Below the capture layer if z-index matters, but handled by portal/layout
           background: 'rgba(0,0,0,0.95)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           backdropFilter: 'blur(10px)'
         }}>
-          <div style={{ transform: 'scale(0.35)', transformOrigin: 'center center' }}>
+          <div style={{ transform: 'scale(0.35)', transformOrigin: 'center center', opacity: 0.8 }}>
+            {/* Preview Copy */}
             <ShareCard
-              ref={shareRef}
               streak={streak}
               habits={habits}
               todayHabits={todayHabits}
@@ -375,9 +380,37 @@ function App() {
               avatarImage={avatarSnapshot}
             />
           </div>
-          <div style={{ position: 'absolute', bottom: '10%', color: '#39FF14', fontFamily: 'monospace', letterSpacing: '2px' }}>
-            INITIALIZING NEURAL LINK...
+          <div style={{ position: 'absolute', bottom: '10%', color: '#39FF14', fontFamily: 'monospace', letterSpacing: '2px', textAlign: 'center' }}>
+            <div className="glitch-text" style={{ fontSize: '24px', marginBottom: '10px' }}>GENERATING STATUS</div>
+            <div style={{ fontSize: '14px', opacity: 0.7 }}>INITIALIZING NEURAL LINK...</div>
           </div>
+        </div>
+      )}
+
+      {/* 
+          HIDDEN CAPTURE LAYER (Actual Render Target)
+          - Rendered 1:1 Scale (1080x1920)
+          - Placed off-screen but fully rendered
+          - No CSS transforms that confuse html2canvas
+      */}
+      {isGeneratingShare && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: '200vw', // Far off-screen
+          width: '1080px',
+          height: '1920px',
+          zIndex: 99999,
+          background: '#000', // Ensure dark bg backing
+        }}>
+          <ShareCard
+            ref={shareRef} // Capture this one
+            streak={streak}
+            habits={habits}
+            todayHabits={todayHabits}
+            history={history}
+            avatarImage={avatarSnapshot}
+          />
         </div>
       )}
 
