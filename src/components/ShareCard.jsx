@@ -23,86 +23,113 @@ const ShareCard = forwardRef(({ streak, habits, todayHabits, avatarImage }, ref)
     const dis = Math.round(((completionRate + (Math.min(streak, 30) / 30)) / 2) * 100);
     const teq = Math.round(((getCatRate('knowledge') + getCatRate('recovery') + getCatRate('nutrition')) / 3) * 100);
 
-    // Theme Logic
-    let themeColor = '#ff4757'; // Default Red
+    // Theme Logic & Titles
+    let themeColor = '#ff3b3b'; // Base Red
     let tierName = 'ROOKIE';
+    let tierGlow = 'rgba(255, 59, 59, 0.4)';
 
-    if (streak > 50) { themeColor = '#39FF14'; tierName = 'GODLIKE'; } // Neon Green
-    else if (streak > 20) { themeColor = '#2ed573'; tierName = 'ELITE'; } // Green
-    else if (streak > 10) { themeColor = '#ffa502'; tierName = 'PRO'; } // Orange
-    else if (streak > 3) { themeColor = '#1e90ff'; tierName = 'SOLDIER'; } // Blue
+    if (streak > 50) {
+        themeColor = '#39FF14';
+        tierName = 'GODLIKE';
+        tierGlow = 'rgba(57, 255, 20, 0.6)';
+    }
+    else if (streak > 20) {
+        themeColor = '#00F0FF';
+        tierName = 'CYBER';
+        tierGlow = 'rgba(0, 240, 255, 0.5)';
+    }
+    else if (streak > 10) {
+        themeColor = '#FFD600';
+        tierName = 'ELITE';
+        tierGlow = 'rgba(255, 214, 0, 0.5)';
+    }
+    else if (streak > 3) {
+        themeColor = '#7000FF';
+        tierName = 'OPERATOR';
+        tierGlow = 'rgba(112, 0, 255, 0.5)';
+    }
 
     return (
-        <div ref={ref} className="share-card-modern" style={{ '--theme-color': themeColor }}>
+        <div ref={ref} className="share-card-poster" style={{
+            '--theme-color': themeColor,
+            '--theme-glow': tierGlow
+        }}>
+            {/* NOISE & TEXTURE OVERLAY */}
+            <div className="poster-texture"></div>
 
-            {/* 1. HERO IMAGE LAYER (Background) */}
-            <div className="mc-hero-layer">
+            {/* 1. BACKGROUND / AVATAR LAYER */}
+            <div className="poster-bg">
                 {avatarImage ? (
-                    <img src={avatarImage} className="mc-avatar-bg" alt="Avatar" />
+                    <img src={avatarImage} className="poster-avatar-img" alt="Avatar" />
                 ) : (
-                    <div className="mc-avatar-placeholder" />
+                    <div className="poster-avatar-placeholder" />
                 )}
-                <div className="mc-gradient-overlay"></div>
+                {/* Duotone Gradient Map Effect */}
+                <div className="poster-gradient-map"></div>
+                <div className="poster-vignette"></div>
             </div>
 
-            {/* 2. CONTENT LAYER */}
-            <div className="mc-content">
+            {/* 2. TYPOGRAPHY LAYER */}
+            <div className="poster-content">
 
-                {/* Header Badge */}
-                <div className="mc-header">
-                    <div className="mc-brand-pill">
-                        <span className="mc-icon">⚡</span> OPTIMAL
+                {/* Header */}
+                <header className="poster-header">
+                    <div className="poster-brand">
+                        <span className="poster-icon">⚡</span> OPTIMAL
                     </div>
-                    <div className="mc-date">{new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short' }).toUpperCase()}</div>
+                    <div className="poster-date">
+                        {new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short' }).toUpperCase()} / 2024
+                    </div>
+                </header>
+
+                {/* CENTRAL STAT (Massive) */}
+                <div className="poster-hero-stat">
+                    <div className="poster-big-num">{streak}</div>
+                    <div className="poster-big-label">DAY STREAK</div>
                 </div>
 
-                {/* Main Text (Big Flex) */}
-                <div className="mc-main-stat">
-                    <div className="mc-streak-val">{streak}</div>
-                    <div className="mc-streak-label">DAY STREAK</div>
-                </div>
+                {/* INFO GRID */}
+                <div className="poster-info-grid">
 
-                {/* Glass Card Info */}
-                <div className="mc-stats-card glass-panel-clean">
-                    <div className="mc-tier-row">
-                        <span className="mc-tier-label">STATUS</span>
-                        <span className="mc-tier-val" style={{ color: themeColor }}>{tierName}</span>
+                    {/* Rank Badge */}
+                    <div className="poster-rank-box">
+                        <div className="poster-sub-label">CURRENT RANK</div>
+                        <div className="poster-rank-val">{tierName}</div>
                     </div>
 
-                    <div className="mc-separator"></div>
-
-                    <div className="mc-grid-row">
-                        <div className="mc-stat-item">
-                            <div className="mc-stat-num">{str}%</div>
-                            <div className="mc-stat-name">STR</div>
+                    {/* Minimal Stats */}
+                    <div className="poster-stats-row">
+                        <div className="stat-pill">
+                            <span className="sp-label">STR</span>
+                            <span className="sp-val">{str}</span>
                         </div>
-                        <div className="mc-stat-item">
-                            <div className="mc-stat-num">{dis}%</div>
-                            <div className="mc-stat-name">DIS</div>
+                        <div className="stat-pill">
+                            <span className="sp-label">DIS</span>
+                            <span className="sp-val">{dis}</span>
                         </div>
-                        <div className="mc-stat-item">
-                            <div className="mc-stat-num">{teq}%</div>
-                            <div className="mc-stat-name">TEQ</div>
+                        <div className="stat-pill">
+                            <span className="sp-label">TEQ</span>
+                            <span className="sp-val">{teq}</span>
                         </div>
-                    </div>
-
-                    <div className="mc-power-row">
-                        <span>POWER LVL</span>
-                        <strong>{powerLevel.toLocaleString()}</strong>
                     </div>
                 </div>
 
             </div>
 
-            {/* 3. FOOTER */}
-            <div className="mc-footer">
-                <div className="mc-cta">
-                    <p>CAN YOU BEAT ME?</p>
-                    <p className="mc-sub">Download Optimal Protocol</p>
+            {/* 3. TICKET FOOTER (High Contrast) */}
+            <div className="poster-footer">
+                <div className="ticket-left">
+                    <div className="ticket-title">JOIN THE PROTOCOL</div>
+                    <div className="ticket-sub">Establish your neural link</div>
+                    <div className="ticket-power">
+                        <span>PWR</span> {powerLevel.toLocaleString()}
+                    </div>
                 </div>
-                <div className="mc-qr-box">
+                <div className="ticket-divider"></div>
+                <div className="ticket-right">
                     <img
-                        src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://optimalprotocol.app&color=000000&bgcolor=ffffff&margin=0"
+                        src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://optimalprotocol.app&color=000000&bgcolor=ffffff&margin=0"
+                        className="ticket-qr"
                         alt="Join"
                     />
                 </div>
