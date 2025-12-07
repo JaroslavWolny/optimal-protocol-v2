@@ -321,7 +321,19 @@ function App() {
         </button>
       </div>
 
-      <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        zIndex: -5,
+        opacity: 0,
+        pointerEvents: 'none',
+        // Ensure it has dimensions for capture
+        width: '1080px',
+        height: '1920px',
+        transform: 'scale(0.5)', // Optional: Scale down to not mess up layout flow if any
+        transformOrigin: 'top left'
+      }}>
         <ShareCard
           ref={shareRef}
           streak={streak}
