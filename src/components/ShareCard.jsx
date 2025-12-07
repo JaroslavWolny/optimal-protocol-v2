@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import './ShareCard.css';
 
 const ShareCard = forwardRef(({ streak, habits, todayHabits, avatarImage }, ref) => {
@@ -7,13 +8,13 @@ const ShareCard = forwardRef(({ streak, habits, todayHabits, avatarImage }, ref)
     const completedToday = todayHabits.filter(h => h.completed).length;
     const completionRate = totalHabits > 0 ? (completedToday / totalHabits) : 0;
 
-    // Power Level
+    // Power Level Logic
     const basePower = 1000;
     const streakBonus = streak * 800;
     const dailyBonus = completionRate * 500;
     let powerLevel = Math.round(basePower + streakBonus + dailyBonus);
 
-    // Stats
+    // Stats Logic
     const getCatRate = (cat) => {
         const catHabits = todayHabits.filter(h => (h.category || 'training') === cat);
         if (catHabits.length === 0) return 0;
@@ -23,36 +24,17 @@ const ShareCard = forwardRef(({ streak, habits, todayHabits, avatarImage }, ref)
     const dis = Math.round(((completionRate + (Math.min(streak, 30) / 30)) / 2) * 100);
     const teq = Math.round(((getCatRate('knowledge') + getCatRate('recovery') + getCatRate('nutrition')) / 3) * 100);
 
-    // Theme Logic & Titles
-    let themeColor = '#ff3b3b'; // Base Red
-    let tierName = 'ROOKIE';
-    let tierGlow = 'rgba(255, 59, 59, 0.4)';
-
-    if (streak > 50) {
-        themeColor = '#39FF14';
-        tierName = 'GODLIKE';
-        tierGlow = 'rgba(57, 255, 20, 0.6)';
-    }
-    else if (streak > 20) {
-        themeColor = '#00F0FF';
-        tierName = 'CYBER';
-        tierGlow = 'rgba(0, 240, 255, 0.5)';
-    }
-    else if (streak > 10) {
-        themeColor = '#FFD600';
-        tierName = 'ELITE';
-        tierGlow = 'rgba(255, 214, 0, 0.5)';
-    }
-    else if (streak > 3) {
-        themeColor = '#7000FF';
-        tierName = 'OPERATOR';
-        tierGlow = 'rgba(112, 0, 255, 0.5)';
-    }
+    // 2. Dynamic Theme
+    let statusTitle = 'INITIATE';
+    let statusColor = '#ff6b6b';
+    if (powerLevel > 9000) { statusTitle = 'GODLIKE'; statusColor = '#39FF14'; }
+    else if (powerLevel > 5000) { statusTitle = 'ELITE'; statusColor = '#39D1FF'; }
+    else if (powerLevel > 2000) { statusTitle = 'OPERATIVE'; statusColor = '#FFD139'; }
 
     return (
         <div ref={ref} className="share-card-poster" style={{
-            '--theme-color': themeColor,
-            '--theme-glow': tierGlow
+            '--theme-color': statusColor,
+            '--theme-glow': statusColor === '#39FF14' ? 'rgba(57, 255, 20, 0.6)' : 'rgba(255, 107, 107, 0.4)'
         }}>
             {/* NOISE & TEXTURE OVERLAY */}
             <div className="poster-texture"></div>
@@ -60,7 +42,7 @@ const ShareCard = forwardRef(({ streak, habits, todayHabits, avatarImage }, ref)
             {/* 1. BACKGROUND / AVATAR LAYER */}
             <div className="poster-bg">
                 {avatarImage ? (
-                    <img src={avatarImage} className="poster-avatar-img" alt="Avatar" crossOrigin="anonymous" />
+                    <img src={avatarImage} className="poster-avatar-img" alt="Avatar" />
                 ) : (
                     <div className="poster-avatar-placeholder" />
                 )}
@@ -94,7 +76,7 @@ const ShareCard = forwardRef(({ streak, habits, todayHabits, avatarImage }, ref)
                     {/* Rank Badge */}
                     <div className="poster-rank-box">
                         <div className="poster-sub-label">CURRENT RANK</div>
-                        <div className="poster-rank-val">{tierName}</div>
+                        <div className="poster-rank-val">{statusTitle}</div>
                     </div>
 
                     {/* Minimal Stats */}
@@ -113,7 +95,6 @@ const ShareCard = forwardRef(({ streak, habits, todayHabits, avatarImage }, ref)
                         </div>
                     </div>
                 </div>
-
             </div>
 
             {/* 3. TICKET FOOTER (High Contrast) */}
@@ -131,12 +112,15 @@ const ShareCard = forwardRef(({ streak, habits, todayHabits, avatarImage }, ref)
                         <div>SWIPE UP TO JOIN</div>
                         <div style={{ opacity: 0.5 }}>SCAN TO START</div>
                     </div>
-                    <img
-                        src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://optimalprotocol.app&color=000000&bgcolor=ffffff&margin=0"
-                        className="ticket-qr"
-                        alt="Join"
-                        crossOrigin="anonymous"
-                    />
+                    <div className="ticket-qr-wrapper">
+                        <QRCodeSVG
+                            value="https://optimalprotocol.app"
+                            size={140}
+                            className="ticket-qr"
+                            fgColor="#000000"
+                            bgColor="#ffffff"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
