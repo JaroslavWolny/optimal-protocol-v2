@@ -142,7 +142,7 @@ function App() {
     try {
       play('charge');
       triggerHaptic('medium');
-      console.log('Initiating share sequence...');
+      // alert('DEBUG: 1 - Starting Share'); // Uncomment for deep debug
 
       // 1. Capture Avatar Snapshot
       let snapshot = null;
@@ -155,38 +155,40 @@ function App() {
         }
       }
 
-      // 2. Show the Card (Visible Render)
+      // 2. Show Loading
       setIsGeneratingShare(true);
 
-      // 3. Wait for Render & Image Load (Critical for html2canvas)
-      // Giving it 2000ms to ensure full layout and asset loading (fonts especially)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // 3. Wait for Re-render with new snapshot
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // 4. Capture & Share
+      // 4. Check Ref
       const elementToShare = shareRef.current;
-      if (elementToShare) {
-        const { shareElement } = await import('./utils/shareUtils');
-        const success = await shareElement(
-          elementToShare,
-          `optimal-status-${today}.png`,
-          'PROTOCOL STATUS',
-          `Day ${streak} complete. Power Level: CHECKED. #OptimalProtocol`
-        );
+      if (!elementToShare) {
+        alert('ERROR: Share Card element not found!');
+        setIsGeneratingShare(false);
+        return;
+      }
 
-        if (success) {
-          triggerHaptic('success');
-        } else {
-          alert('Share generation failed. Please try again.');
-        }
+      // 5. Generate
+      // alert('DEBUG: 2 - Generating Canvas'); 
+      const { shareElement } = await import('./utils/shareUtils');
+      const success = await shareElement(
+        elementToShare,
+        `optimal-status-${today}.png`,
+        'PROTOCOL STATUS',
+        `Day ${streak} complete. Power Level: CHECKED. #OptimalProtocol`
+      );
+
+      if (!success) {
+        alert('ERROR: Canvas generation failed.');
       } else {
-        console.error('Share Reference Invalid');
+        triggerHaptic('success');
       }
 
     } catch (error) {
       console.error('Share Error:', error);
-      alert('System Error during generation.');
+      alert('CRITICAL ERROR: ' + error.message);
     } finally {
-      // 5. Hide Card
       setIsGeneratingShare(false);
       setAvatarSnapshot(null);
     }
@@ -357,6 +359,35 @@ function App() {
           - Visual feedback only
       */}
       {/* 
+          CAPTURE LAYER (Always Mounted for Stability)
+          - Rendered 1:1 Scale (1080x1920)
+          - zIndex -100 to be behind everything
+          - opacity 0.01 to be technically visible but unseen
+          - pointerEvents none
+      */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '1080px',
+        height: '1920px',
+        zIndex: -100,
+        opacity: 0.01,
+        pointerEvents: 'none',
+        background: '#000',
+        overflow: 'hidden'
+      }}>
+        <ShareCard
+          ref={shareRef}
+          streak={streak}
+          habits={habits}
+          todayHabits={todayHabits}
+          history={history}
+          avatarImage={avatarSnapshot}
+        />
+      </div>
+
+      {/* 
           VISIBLE LOADING OVERLAY (Stealth Mode)
           - Blocks user interaction
           - Shows "Processing" state
@@ -396,34 +427,6 @@ function App() {
           <div style={{ marginTop: '20px', color: '#666', fontFamily: 'monospace' }}>
             ENCRYPTING PROTOCOL DATA
           </div>
-        </div>
-      )}
-
-      {/* 
-          CAPTURE LAYER (Behind Loading, Above App)
-          - Rendered 1:1 Scale (1080x1920)
-          - zIndex 1000 makes it "foreground" relative to app, ensuring paint
-          - But zIndex 2000 overlay covers it visually for user
-      */}
-      {isGeneratingShare && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '1080px',
-          height: '1920px',
-          zIndex: 1000,
-          background: '#000',
-          pointerEvents: 'none'
-        }}>
-          <ShareCard
-            ref={shareRef}
-            streak={streak}
-            habits={habits}
-            todayHabits={todayHabits}
-            history={history}
-            avatarImage={avatarSnapshot}
-          />
         </div>
       )}
 
