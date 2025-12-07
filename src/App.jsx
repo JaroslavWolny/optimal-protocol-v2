@@ -136,34 +136,35 @@ function App() {
     }
   };
 
+  const [isGeneratingShare, setIsGeneratingShare] = useState(false);
+
   const handleShare = async () => {
     try {
       play('charge');
       triggerHaptic('medium');
       console.log('Initiating share sequence...');
 
-      // 1. Capture Avatar Snapshot if available
+      // 1. Capture Avatar Snapshot
       let snapshot = null;
       if (bodyRef.current) {
         try {
           snapshot = bodyRef.current.getSnapshot();
-          console.log('Avatar snapshot captured:', snapshot ? 'Success' : 'Failed');
           if (snapshot) setAvatarSnapshot(snapshot);
         } catch (e) {
           console.error('Snapshot failed:', e);
         }
       }
 
-      // Wait for React to render the new props into ShareCard
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // 2. Show the Card (Visible Render)
+      setIsGeneratingShare(true);
 
-      // Use the new Share Card (shareRef) if available, otherwise fallback to ProofHUD
-      const elementToShare = shareRef.current || proofRef.current;
+      // 3. Wait for Render & Image Load (Critical for html2canvas)
+      // Giving it 800ms to ensure full layout and asset loading
+      await new Promise(resolve => setTimeout(resolve, 800));
 
+      // 4. Capture & Share
+      const elementToShare = shareRef.current;
       if (elementToShare) {
-        console.log('Element found, generating canvas...');
-
-        // Use the new One-Tap Share utility
         const { shareElement } = await import('./utils/shareUtils');
         const success = await shareElement(
           elementToShare,
@@ -174,19 +175,20 @@ function App() {
 
         if (success) {
           triggerHaptic('success');
-          console.log('Share successful');
         } else {
-          console.error('Share utility returned false');
           alert('Share generation failed. Please try again.');
         }
-
-        setAvatarSnapshot(null); // Clear after sharing
       } else {
-        console.error('No element to share found (ref is null)');
+        console.error('Share Reference Invalid');
       }
+
     } catch (error) {
-      console.error('Critical error in handleShare:', error);
-      alert('System Error: Could not generate status report.');
+      console.error('Share Error:', error);
+      alert('System Error during generation.');
+    } finally {
+      // 5. Hide Card
+      setIsGeneratingShare(false);
+      setAvatarSnapshot(null);
     }
   };
 
@@ -329,15 +331,15 @@ function App() {
       </div>
 
       <div className="fixed-action-bar">
-        <button className="cyber-share-btn" onClick={handleShare}>
+        <button className="cyber-share-btn" onClick={handleShare} disabled={isGeneratingShare}>
           <div className="btn-bg-layer"></div>
           <div className="btn-content">
             <div className="btn-icon-box">
-              <span className="btn-icon">🚀</span>
+              <span className="btn-icon">{isGeneratingShare ? '⏳' : '🚀'}</span>
             </div>
             <div className="btn-text-stack">
-              <span className="btn-action">DEPLOY STATUS</span>
-              <span className="btn-sub">GENERATE PROOF OF WORK</span>
+              <span className="btn-action">{isGeneratingShare ? 'GENERATING...' : 'DEPLOY STATUS'}</span>
+              <span className="btn-sub">{isGeneratingShare ? 'PROCESSING DATA' : 'GENERATE PROOF OF WORK'}</span>
             </div>
           </div>
           <div className="btn-scanline"></div>
@@ -345,32 +347,39 @@ function App() {
       </div>
 
       {/* 
-          SHARE CARD CONTAINER 
-          Using 'top: 100vh' moves it off-screen without hiding it from the renderer.
-          Transparency is kept at 1 (fully visible to renderer).
-          z-index ensures it's behind everything.
+          VISIBLE SHARE OVERLAY
+          Rendered on top of everything when generating.
+          This ensures browser correctly paints the element for html2canvas.
       */}
-      <div style={{
-        position: 'fixed',
-        top: '100vh',
-        left: 0,
-        zIndex: -9999,
-        width: '1080px',
-        height: '1920px',
-        pointerEvents: 'none',
-        // Optional: Scale down to fit layout if necessary, but keep 1 for full res capture if possible
-        transform: 'scale(1)',
-        transformOrigin: 'top left'
-      }}>
-        <ShareCard
-          ref={shareRef}
-          streak={streak}
-          habits={habits}
-          todayHabits={todayHabits}
-          history={history}
-          avatarImage={avatarSnapshot}
-        />
-      </div>
+      {isGeneratingShare && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: 99999,
+          background: 'rgba(0,0,0,0.95)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <div style={{ transform: 'scale(0.35)', transformOrigin: 'center center' }}>
+            <ShareCard
+              ref={shareRef}
+              streak={streak}
+              habits={habits}
+              todayHabits={todayHabits}
+              history={history}
+              avatarImage={avatarSnapshot}
+            />
+          </div>
+          <div style={{ position: 'absolute', bottom: '10%', color: '#39FF14', fontFamily: 'monospace', letterSpacing: '2px' }}>
+            INITIALIZING NEURAL LINK...
+          </div>
+        </div>
+      )}
 
       <KnowledgeCardModal
         show={showKnowledgeCard}
