@@ -15,45 +15,43 @@ export const shareElement = async (element, fileName = 'share.png', title = 'Sha
 
         // 1. Capture the element
         const canvas = await html2canvas(element, {
-            backgroundColor: null, // Transparent background if possible, or use specific color
-            scale: 2, // Higher resolution
-            useCORS: true, // Allow cross-origin images (like QR codes)
+            backgroundColor: null,
+            scale: 2,
+            useCORS: true,
             logging: false
         });
 
-        // 2. Convert to Base64
-        const base64Data = canvas.toDataURL('image/png');
+        // 2. Platform Check
+        const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
 
-        // 3. Write to filesystem (Capacitor Share needs a file path on some platforms, or base64)
-        // For Capacitor Share, we can often pass base64 directly as a file, or write it.
-        // Let's try writing to cache first for better compatibility.
+        if (isNative) {
+            // --- NATIVE SHARING (Capacitor) ---
+            const base64Data = canvas.toDataURL('image/png');
+            const savedFile = await Filesystem.writeFile({
+                path: fileName,
+                data: base64Data,
+                directory: Directory.Cache
+            });
 
-        const savedFile = await Filesystem.writeFile({
-            path: fileName,
-            data: base64Data,
-            directory: Directory.Cache
-        });
-
-        // 4. Share
-        await Share.share({
-            title: title,
-            text: text,
-            url: savedFile.uri,
-            dialogTitle: title,
-        });
+            await Share.share({
+                title: title,
+                text: text,
+                url: savedFile.uri,
+                dialogTitle: title,
+            });
+        } else {
+            // --- WEB SHARING (Download Fallback) ---
+            // Web Share API Level 2 supports files, but support is spotty.
+            // For now, we force download which is reliable.
+            const link = document.createElement('a');
+            link.download = fileName;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
 
         return true;
     } catch (error) {
         console.error('Error sharing element:', error);
-        // Fallback for web: Download the image
-        if (!window.Capacitor) {
-            const canvas = await html2canvas(element, { scale: 2 });
-            const link = document.createElement('a');
-            link.download = fileName;
-            link.href = canvas.toDataURL();
-            link.click();
-            return true;
-        }
         return false;
     }
 };

@@ -149,7 +149,7 @@ const IdentityInitialization = () => {
                             </button>
                         </div>
 
-                        <div className="divider">OR ACCESS CODE</div>
+                        <div className="divider">OR EMAIL LINK</div>
 
                         <form className="email-input-group" onSubmit={handleMagicLink}>
                             <input

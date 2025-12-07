@@ -15,7 +15,7 @@ const DeathCertificate = ({ user, onRespawn }) => {
                 certificateRef.current,
                 'death-certificate.png',
                 'I DIED.',
-                `I failed the Optimal Protocol at Level ${user?.avatar_stage || 0}. Shame me.`
+                `I failed the Optimal Protocol at Level ${user?.avatar_stage || 0}. Shame me. #OptimalProtocol #Failed #WeaknessIsAChoice`
             );
 
             if (shared) {
