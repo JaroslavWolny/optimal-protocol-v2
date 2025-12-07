@@ -10,7 +10,34 @@ import './BodyWidget.css';
 const FPS_LIMIT = 12; // Animace postavy poběží jen na 12 FPS (Doom style)
 
 // --- SCENE SETUP ---
-const BodyWidget = ({ stats, isPumped = false, streak = 0, hardcoreMode = false }) => {
+const ScreenshotHandler = ({ captureRef }) => {
+    const { gl, scene, camera } = useThree();
+
+    useEffect(() => {
+        if (captureRef) {
+            captureRef.current = () => {
+                gl.render(scene, camera);
+                return gl.domElement.toDataURL('image/png', 1.0);
+            };
+        }
+    }, [gl, scene, camera, captureRef]);
+
+    return null;
+};
+
+// --- SCENE SETUP ---
+const BodyWidget = React.forwardRef(({ stats, isPumped = false, streak = 0, hardcoreMode = false }, ref) => {
+    const captureFnRef = useRef(null);
+
+    React.useImperativeHandle(ref, () => ({
+        getSnapshot: () => {
+            if (captureFnRef.current) {
+                return captureFnRef.current();
+            }
+            return null;
+        }
+    }));
+
     const safeStats = stats || { training: 0, nutrition: 0, recovery: 0, knowledge: 0 };
     const integrity = (safeStats.training + safeStats.nutrition + safeStats.recovery + safeStats.knowledge) / 4;
     const isGodMode = integrity >= 0.9 && streak > 30;
@@ -52,6 +79,8 @@ const BodyWidget = ({ stats, isPumped = false, streak = 0, hardcoreMode = false 
                 gl={{ antialias: false, preserveDrawingBuffer: true }}
                 dpr={1} // Zvýšeno pro lepší čitelnost před pixelizací
             >
+                <ScreenshotHandler captureRef={captureFnRef} />
+
                 <color attach="background" args={['#101010']} /> {/* Trochu světlejší pozadí */}
 
                 {/* Lighting - High Contrast Doom Style - ZESVĚTLENO */}
@@ -104,6 +133,6 @@ const BodyWidget = ({ stats, isPumped = false, streak = 0, hardcoreMode = false 
             </Canvas>
         </div>
     );
-};
+});
 
 export default BodyWidget;

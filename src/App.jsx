@@ -40,7 +40,8 @@ function App() {
   const [isPumped, setIsPumped] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
 
-  // REFS
+  const [avatarSnapshot, setAvatarSnapshot] = useState(null);
+  const bodyRef = useRef(null);
   const proofRef = useRef(null);
   const shareRef = useRef(null);
 
@@ -136,23 +137,33 @@ function App() {
   };
 
   const handleShare = async () => {
+    play('charge');
+    triggerHaptic('medium');
+
+    // 1. Capture Avatar Snapshot if available
+    let snapshot = null;
+    if (bodyRef.current) {
+      snapshot = bodyRef.current.getSnapshot();
+      setAvatarSnapshot(snapshot);
+      // Wait for render to update ShareCard with the image
+      await new Promise(resolve => setTimeout(resolve, 150));
+    }
+
     // Use the new Share Card (shareRef) if available, otherwise fallback to ProofHUD
     const elementToShare = shareRef.current || proofRef.current;
 
     if (elementToShare) {
-      play('charge');
-      triggerHaptic('medium');
-
       // Use the new One-Tap Share utility
       const { shareElement } = await import('./utils/shareUtils');
       await shareElement(
         elementToShare,
         `optimal-status-${today}.png`,
-        'MY PROTOCOL STATUS',
-        `Day ${streak} of the Optimal Protocol. Can you keep up?`
+        'PROTOCOL STATUS',
+        `Day ${streak} complete. Power Level: CHECKED. #OptimalProtocol`
       );
 
       triggerHaptic('success');
+      setAvatarSnapshot(null); // Clear after sharing to save memory/state
     }
   };
 
@@ -268,7 +279,14 @@ function App() {
 
       <div className="glass-panel main-panel">
 
-        <BodyWidget stats={currentStats} isAllDone={isAllDone} isPumped={isPumped} streak={streak} hardcoreMode={hardcoreMode} />
+        <BodyWidget
+          ref={bodyRef}
+          stats={currentStats}
+          isAllDone={isAllDone}
+          isPumped={isPumped}
+          streak={streak}
+          hardcoreMode={hardcoreMode}
+        />
 
         {habits.length === 0 ? (
           <ProtocolSelector onSelect={handleProtocolSelect} />
@@ -302,6 +320,7 @@ function App() {
           habits={habits}
           todayHabits={todayHabits}
           history={history}
+          avatarImage={avatarSnapshot}
         />
       </div>
 

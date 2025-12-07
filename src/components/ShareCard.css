@@ -1,372 +1,316 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Unbounded:wght@700;900&display=swap');
 
-/* --- CONTAINER & BACKGROUND --- */
-.share-card-v2 {
+.share-card-v3 {
     width: 1080px;
     height: 1920px;
-    background: #000000;
+    background-color: #050505;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
     position: relative;
     overflow: hidden;
     color: white;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Share Tech Mono', monospace;
     display: flex;
     flex-direction: column;
+    padding: 60px;
+    box-sizing: border-box;
 }
 
-.bg-noise {
+/* Effects */
+.sc-noise {
     position: absolute;
     inset: 0;
-    opacity: 0.07;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.1;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+}
+
+.sc-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 40%, transparent 40%, #000000 100%);
     pointer-events: none;
     z-index: 1;
 }
 
-.bg-gradient {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 50% 30%, #1a1a1a 0%, #000000 70%);
-    z-index: 0;
+/* Header */
+.sc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 30px;
+    margin-bottom: 60px;
+    z-index: 2;
 }
 
-.card-inner {
-    position: relative;
-    z-index: 10;
-    height: 100%;
-    padding: 80px 60px;
+.sc-brand {
+    font-size: 32px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.sc-logo-icon {
+    color: #39FF14;
+    font-size: 40px;
+}
+
+.sc-date {
+    color: #666;
+    font-size: 32px;
+}
+
+/* Content Layout */
+.sc-content {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 60px;
+    z-index: 2;
 }
 
-/* --- DECORATIONS --- */
-.corner-accent {
+/* Avatar Frame - The Hero */
+.sc-avatar-frame {
+    width: 100%;
+    height: 900px;
+    border: 2px solid #444;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at center, #1a1a1a 0%, #000000 80%);
+    overflow: hidden;
+}
+
+.sc-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* or contain, depending on capture */
+    transform: scale(1.1);
+}
+
+.sc-avatar-placeholder {
+    color: #444;
+    font-size: 24px;
+    animation: blink 1s infinite;
+}
+
+/* Tech decorations on frame */
+.sc-corner-brackets::before,
+.sc-corner-brackets::after {
+    content: '';
     position: absolute;
-    width: 150px;
-    height: 150px;
-    border: 4px solid transparent;
+    width: 40px;
+    height: 40px;
+    border: 4px solid white;
     z-index: 5;
 }
 
-.top-left {
-    top: 40px;
-    left: 40px;
-    border-top-color: inherit;
-    border-left-color: inherit;
+.sc-corner-brackets::before {
+    top: 0;
+    left: 0;
+    border-right: 0;
+    border-bottom: 0;
 }
 
-.bottom-right {
-    bottom: 40px;
-    right: 40px;
-    border-bottom-color: inherit;
-    border-right-color: inherit;
+.sc-corner-brackets::after {
+    bottom: 0;
+    right: 0;
+    border-left: 0;
+    border-top: 0;
 }
 
-/* --- HEADER --- */
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 40px;
+.sc-scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0.3;
+    animation: scan 4s linear infinite;
+    pointer-events: none;
 }
 
-.brand-tag {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 32px;
-    letter-spacing: 2px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.bolt {
-    color: #39FF14;
-}
-
-.date-tag {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 32px;
-    color: #666;
-}
-
-/* --- STATUS CORE --- */
-.status-core {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 60px;
-    margin-top: -50px;
-    /* Visual balance */
-}
-
-.core-ring-outer {
-    width: 480px;
-    height: 480px;
-    border-radius: 50%;
-    border: 2px dashed;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: spin 60s linear infinite;
-}
-
-.core-ring-inner {
-    width: 400px;
-    height: 400px;
-    border-radius: 50%;
-    border: 8px solid;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
-}
-
-.share-card-v2 .streak-val {
-    font-size: 160px;
-    font-weight: 800;
-    line-height: 1;
-}
-
-.streak-label {
-    font-size: 24px;
+.sc-rank-badge {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 64px;
+    font-weight: 900;
+    color: black;
+    text-transform: uppercase;
     letter-spacing: 4px;
-    opacity: 0.5;
-    margin-top: 10px;
 }
 
-.status-title-group {
+/* Data Column */
+.sc-data-column {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin-top: 20px;
+}
+
+.sc-power-block {
     text-align: center;
 }
 
-.status-label {
-    font-family: 'Share Tech Mono', monospace;
+.sc-label-tiny {
     font-size: 24px;
     color: #666;
-    letter-spacing: 2px;
+    letter-spacing: 4px;
     margin-bottom: 10px;
 }
 
-.status-main {
-    font-size: 110px;
-    font-weight: 900;
+.sc-power-val {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 140px;
     line-height: 1;
-    letter-spacing: -2px;
-    margin: 0;
-    text-transform: uppercase;
+    font-weight: 900;
     font-style: italic;
 }
 
-.status-sub {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 32px;
-    margin-top: 20px;
-    opacity: 0.7;
-    letter-spacing: 4px;
-}
-
-/* --- TACTICAL GRID --- */
-.tactical-grid {
+.sc-stat-grid {
     display: flex;
     flex-direction: column;
-    gap: 30px;
-    margin-bottom: 60px;
-    padding: 40px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
+    gap: 20px;
+    padding: 20px 0;
+    border-top: 1px solid #222;
+    border-bottom: 1px solid #222;
 }
 
-.tactical-row {
+.sc-stat-row {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    gap: 20px;
 }
 
-.tactical-info {
-    display: flex;
-    justify-content: space-between;
-    font-family: 'Share Tech Mono', monospace;
+.sc-stat-name {
+    width: 180px;
     font-size: 28px;
-}
-
-.t-label {
     color: #aaa;
 }
 
-.t-val {
+.sc-stat-bar-bg {
+    flex: 1;
+    height: 24px;
+    background: #111;
+    border: 1px solid #333;
+    transform: skewX(-20deg);
+}
+
+.sc-stat-bar-fill {
+    height: 100%;
+    transition: width 0.5s;
+}
+
+.sc-stat-num {
+    width: 80px;
+    text-align: right;
+    font-size: 32px;
     font-weight: bold;
 }
 
-.tactical-bar-bg {
-    width: 100%;
-    height: 12px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-.tactical-bar-fill {
-    height: 100%;
-    border-radius: 6px;
-}
-
-/* --- FOOTER --- */
-.card-footer {
-    margin-top: auto;
-}
-
-.footer-content {
-    background: white;
-    color: black;
-    padding: 30px 50px;
-    border-radius: 40px;
+/* Streak Block */
+.sc-streak-block {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.cta-text h2 {
-    font-size: 56px;
-    font-weight: 900;
-    line-height: 0.9;
-    margin: 0;
-    letter-spacing: -2px;
-}
-
-.cta-text p {
-    font-size: 24px;
-    margin-top: 10px;
-    opacity: 0.6;
-    font-weight: 600;
-}
-
-.qr-box img {
-    width: 130px;
-    height: 130px;
-    display: block;
-    mix-blend-mode: multiply;
-    /* Ensures perfect blend if not pure white */
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-/* --- POWER LEVEL --- */
-.power-section {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    align-items: baseline;
     justify-content: center;
-    margin-top: -40px;
+    gap: 20px;
 }
 
-.power-label {
-    font-family: 'Share Tech Mono', monospace;
+.sc-streak-num {
+    font-size: 80px;
+    color: white;
+    font-weight: bold;
+}
+
+.sc-streak-label {
     font-size: 32px;
     color: #666;
-    letter-spacing: 4px;
-    margin-bottom: 10px;
 }
 
-.power-value {
-    font-size: 180px;
-    font-weight: 900;
-    font-style: italic;
-    line-height: 0.9;
-    letter-spacing: -5px;
-}
-
-.pvp-text {
-    font-family: 'Outfit', sans-serif;
-    font-size: 42px;
-    font-weight: 800;
-    color: white;
-    margin-top: 40px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    opacity: 0.8;
-}
-
-/* --- RPG STATS GRID --- */
-.rpg-stats-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 40px;
-    padding: 0 40px;
-    margin-bottom: 60px;
-}
-
-.rpg-stat-box {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-}
-
-.rpg-stat-label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 32px;
-    color: #888;
-}
-
-.rpg-stat-val {
-    font-size: 80px;
-    font-weight: 800;
-    color: white;
-    line-height: 1;
-}
-
-.rpg-bar-bg {
-    width: 100%;
-    height: 16px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.rpg-bar-fill {
-    height: 100%;
-    border-radius: 8px;
-}
-
-/* --- IDENTITY FOOTER --- */
-.identity-footer {
+/* Footer */
+.sc-footer {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 0 60px;
-    margin-bottom: 60px;
+    align-items: flex-end;
+    margin-top: auto;
+    z-index: 2;
 }
 
-.id-rank {
-    font-size: 64px;
-    font-weight: 900;
+.sc-quote {
+    font-size: 36px;
     font-style: italic;
-    text-transform: uppercase;
+    color: #888;
+    max-width: 500px;
+    line-height: 1.2;
 }
 
-.id-streak {
-    font-size: 48px;
-    font-weight: 700;
-    color: white;
+.sc-qr-container {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
 }
 
-.fire-icon {
-    font-size: 56px;
+.sc-qr-text {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    color: black;
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 1.2;
+}
+
+.sc-qr-code {
+    width: 100px;
+    height: 100px;
+    display: block;
+}
+
+@keyframes scan {
+    0% {
+        top: 0%;
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.5;
+    }
+
+    90% {
+        opacity: 0.5;
+    }
+
+    100% {
+        top: 100%;
+        opacity: 0;
+    }
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
 }
