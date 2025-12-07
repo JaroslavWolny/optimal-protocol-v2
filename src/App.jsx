@@ -142,7 +142,6 @@ function App() {
     try {
       play('charge');
       triggerHaptic('medium');
-      // alert('DEBUG: 1 - Starting Share'); // Uncomment for deep debug
 
       // 1. Capture Avatar Snapshot
       let snapshot = null;
@@ -170,7 +169,6 @@ function App() {
       }
 
       // 5. Generate
-      // alert('DEBUG: 2 - Generating Canvas'); 
       const { shareElement } = await import('./utils/shareUtils');
       const success = await shareElement(
         elementToShare,

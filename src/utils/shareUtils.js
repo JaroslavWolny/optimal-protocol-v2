@@ -18,7 +18,7 @@ export const shareElement = async (element, fileName = 'share.png', title = 'Sha
             backgroundColor: '#000000',
             useCORS: true,
             allowTaint: false,
-            logging: true,
+            logging: false,
             scale: 1,
             width: 1080,         // Force functionality on small screens
             height: 1920,        // Force functionality on small screens
