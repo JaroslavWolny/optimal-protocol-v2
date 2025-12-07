@@ -144,14 +144,16 @@
     font-weight: 700;
     letter-spacing: -20px;
     color: white;
-    /* Glow Effect */
+    /* Intense Glow Effect */
     text-shadow:
-        0 0 20px var(--theme-glow),
-        0 0 60px var(--theme-glow);
-    opacity: 0.95;
-    /* Simulate the 'cutout' look or solid depending on pref. 
-       Use mild transparency to let avatar show through slightly? */
-    mix-blend-mode: screen;
+        0 0 30px var(--theme-color),
+        0 0 60px var(--theme-color),
+        0 0 100px var(--theme-color);
+    opacity: 1;
+    mix-blend-mode: normal;
+    /* Removed screen to ensure color saturation */
+    z-index: 5;
+    position: relative;
 }
 
 .poster-big-label {
@@ -162,11 +164,13 @@
     color: white;
     text-transform: uppercase;
     margin-top: -40px;
-    /* Pull up into the number */
     text-shadow: 0 4px 10px black;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 0 20px;
-    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.8);
+    /* Darker backdrop */
+    padding: 5px 30px;
+    backdrop-filter: blur(10px);
+    z-index: 6;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* INFO GRID */
@@ -179,8 +183,8 @@
 }
 
 .poster-rank-box {
-    border-left: 6px solid var(--theme-color);
-    padding-left: 24px;
+    border-left: 8px solid var(--theme-color);
+    padding-left: 30px;
     display: flex;
     flex-direction: column;
 }
@@ -190,15 +194,17 @@
     font-size: 24px;
     color: #888;
     margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
 .poster-rank-val {
-    font-size: 100px;
+    font-size: 110px;
     line-height: 0.85;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     color: var(--theme-color);
-    text-shadow: 0 0 30px var(--theme-glow);
+    text-shadow: 0 0 30px var(--theme-glow), 0 0 50px var(--theme-glow);
 }
 
 .poster-stats-row {
