@@ -306,10 +306,18 @@ function App() {
       </div>
 
       <div className="fixed-action-bar">
-        <button className="share-btn-large" onClick={handleShare}>
-          <span className="camera-icon">📸</span>
-          <span className="action-text">GENERATE OVERLAY</span>
-          <div className="btn-shine"></div>
+        <button className="cyber-share-btn" onClick={handleShare}>
+          <div className="btn-bg-layer"></div>
+          <div className="btn-content">
+            <div className="btn-icon-box">
+              <span className="btn-icon">🚀</span>
+            </div>
+            <div className="btn-text-stack">
+              <span className="btn-action">DEPLOY STATUS</span>
+              <span className="btn-sub">GENERATE PROOF OF WORK</span>
+            </div>
+          </div>
+          <div className="btn-scanline"></div>
         </button>
       </div>
 
